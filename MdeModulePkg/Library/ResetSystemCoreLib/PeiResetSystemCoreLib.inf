@@ -1,8 +1,6 @@
-## @file ResetSystemDxe.inf
-# This driver is responsible for hooking and handling the ResetSystem call in DXE.
-# It enables:
-# - Dynamic registration for platform-specific handlers.
-# - Notification callbacks for all drivers to be informed when the system is going down.
+## @file PeiResetSystemCoreLib.inf
+# This file contains the PEI-specific portions of the the ResetSystemCore
+# library.
 #
 ##
 # Copyright (c) 2016, Microsoft Corporation
@@ -28,14 +26,13 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##
 
-
 [Defines]
   INF_VERSION         = 0x00010017
-  BASE_NAME           = ResetSystemRuntimeDxe
-  FILE_GUID           = A97A4CFC-889B-40DE-BBAE-771898155B0C
+  BASE_NAME           = PeiResetSystemCoreLib
+  FILE_GUID           = 2CE53783-6043-41C4-B212-F6A770B6EC45
   VERSION_STRING      = 1.0
-  MODULE_TYPE         = DXE_RUNTIME_DRIVER
-  ENTRY_POINT         = ResetSystemDxeEntryPoint
+  MODULE_TYPE         = PEI_CORE
+  LIBRARY_CLASS       = ResetSystemCoreLib|PEI_CORE
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -45,7 +42,8 @@
 
 
 [Sources]
-  ResetSystem.c
+  PeiResetSystemCoreLib.c
+  CommonResetSystemCoreLib.c
 
 
 [Packages]
@@ -54,17 +52,12 @@
 
 
 [LibraryClasses]
-  BaseLib
+  PeiServicesLib
   DebugLib
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  UefiRuntimeLib
-  ResetSystemCoreLib
+  HobLib
+  ResetHelperLib
+  UefiResetSystemLib
 
 
-[Protocols]
-  gEfiResetArchProtocolGuid                     ## PROTOCOL ## PRODUCES ## Used to indicate that gRT->ResetSystem has been hooked.
-
-
-[Depex]
-  TRUE
+[Ppis]
+  gEfiResetNotifyCallbackPpiGuid    ## CONSUMES ## Used to notify any interested parties of the impending reset.

@@ -1,8 +1,5 @@
-## @file ResetSystemDxe.inf
-# This driver is responsible for hooking and handling the ResetSystem call in DXE.
-# It enables:
-# - Dynamic registration for platform-specific handlers.
-# - Notification callbacks for all drivers to be informed when the system is going down.
+## @file BaseUefiResetSystemLibNull.inf
+# This is a NULL implementation of the UefiResetSystemLib.
 #
 ##
 # Copyright (c) 2016, Microsoft Corporation
@@ -28,24 +25,23 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##
 
-
 [Defines]
   INF_VERSION         = 0x00010017
-  BASE_NAME           = ResetSystemRuntimeDxe
-  FILE_GUID           = A97A4CFC-889B-40DE-BBAE-771898155B0C
+  BASE_NAME           = BaseUefiResetSystemLibNull
+  FILE_GUID           = 1A74C2A0-E430-47F1-B2FD-BA9BE7A4A861
+  MODULE_TYPE         = BASE
   VERSION_STRING      = 1.0
-  MODULE_TYPE         = DXE_RUNTIME_DRIVER
-  ENTRY_POINT         = ResetSystemDxeEntryPoint
+  LIBRARY_CLASS       = UefiResetSystemLib
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 
 [Sources]
-  ResetSystem.c
+  BaseUefiResetSystemLibNull.c
 
 
 [Packages]
@@ -54,17 +50,4 @@
 
 
 [LibraryClasses]
-  BaseLib
   DebugLib
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  UefiRuntimeLib
-  ResetSystemCoreLib
-
-
-[Protocols]
-  gEfiResetArchProtocolGuid                     ## PROTOCOL ## PRODUCES ## Used to indicate that gRT->ResetSystem has been hooked.
-
-
-[Depex]
-  TRUE

@@ -1,8 +1,6 @@
-## @file ResetSystemDxe.inf
-# This driver is responsible for hooking and handling the ResetSystem call in DXE.
-# It enables:
-# - Dynamic registration for platform-specific handlers.
-# - Notification callbacks for all drivers to be informed when the system is going down.
+## @file DxeResetHelperLib.inf
+# This file contains the Reset Helper functions that require
+# special implementations for DXE.
 #
 ##
 # Copyright (c) 2016, Microsoft Corporation
@@ -28,14 +26,13 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##
 
-
 [Defines]
   INF_VERSION         = 0x00010017
-  BASE_NAME           = ResetSystemRuntimeDxe
-  FILE_GUID           = A97A4CFC-889B-40DE-BBAE-771898155B0C
+  BASE_NAME           = DxeResetHelperLib
+  FILE_GUID           = CAFC3CA1-3E32-449F-9B0E-40BA3CB73A12
   VERSION_STRING      = 1.0
-  MODULE_TYPE         = DXE_RUNTIME_DRIVER
-  ENTRY_POINT         = ResetSystemDxeEntryPoint
+  MODULE_TYPE         = DXE_DRIVER
+  LIBRARY_CLASS       = ResetHelperLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -45,7 +42,8 @@
 
 
 [Sources]
-  ResetSystem.c
+  ResetHelperLibCommon.c
+  DxeResetHelperLib.c
 
 
 [Packages]
@@ -54,17 +52,6 @@
 
 
 [LibraryClasses]
-  BaseLib
   DebugLib
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  UefiRuntimeLib
-  ResetSystemCoreLib
-
-
-[Protocols]
-  gEfiResetArchProtocolGuid                     ## PROTOCOL ## PRODUCES ## Used to indicate that gRT->ResetSystem has been hooked.
-
-
-[Depex]
-  TRUE
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib

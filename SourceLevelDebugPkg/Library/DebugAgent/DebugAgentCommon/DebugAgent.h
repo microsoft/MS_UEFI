@@ -2,6 +2,8 @@
   Command header of for Debug Agent library instance.
 
   Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016, Microsoft Corporation
+  
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,7 +23,7 @@
 #include <Ppi/VectorHandoffInfo.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/ResetSystemLib.h>
+#include <Library/UefiResetSystemLib.h>
 #include <Library/IoLib.h>
 #include <Library/HobLib.h>
 #include <Library/DebugCommunicationLib.h>

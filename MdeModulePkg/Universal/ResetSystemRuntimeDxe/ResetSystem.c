@@ -1,163 +1,107 @@
-/** @file
-  Reset Architectural Protocol implementation
+/** @file -- ResetSystemDxe.c
+This driver is responsible for hooking and handling the ResetSystem call in DXE.
+It enables:
+- Dynamic registration for platform-specific handlers.
+- Notification callbacks for all drivers to be informed when the system is going down.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+All rights reserved.
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 
 **/
 
-#include "ResetSystem.h"
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/ResetSystemCoreLib.h>
 
-//
-// The handle onto which the Reset Architectural Protocol is installed
-//
-EFI_HANDLE  mResetHandle = NULL;
 
 /**
   The driver's entry point.
 
-  It initializes the Reset Architectural Protocol.
-
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
   @param[in] SystemTable  A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS     The entry point is executed successfully.
-  @retval other           Cannot install ResetArch protocol.
+
+  @retval EFI_SUCCESS           The entry point executed successfully.
+  @retval EFI_ALREADY_STARTED   An instance of the gEfiResetArchProtocolGuid has already been installed.
+  @retval Other                 Some error occured when executing this entry point.
 
 **/
 EFI_STATUS
 EFIAPI
-InitializeResetSystem (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+ResetSystemDxeEntryPoint (
+  IN    EFI_HANDLE                  ImageHandle,
+  IN    EFI_SYSTEM_TABLE            *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS          Status;
+  EFI_RESET_SYSTEM    PreviousHandler = NULL;
+  VOID                *ResetArchProtocol;
+  EFI_HANDLE          DummyHandle;
+
+  DEBUG(( DEBUG_VERBOSE, __FUNCTION__"()\n" ));
 
   //
-  // Make sure the Reset Architectural Protocol is not already installed in the system
-  //
-  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiResetArchProtocolGuid);
-
-  //
-  // Hook the runtime service table
-  //
-  gRT->ResetSystem = ResetSystem;
-
-  //
-  // Now install the Reset RT AP on a new handle
-  //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mResetHandle,
-                  &gEfiResetArchProtocolGuid,
-                  NULL,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  return Status;
-}
-
-/**
-  Put the system into S3 power state.                            
-**/
-VOID
-DoS3 (
-  VOID
-  )
-{
-  EnterS3WithImmediateWake ();
-
-  //
-  // Should not return
-  //
-  CpuDeadLoop ();
-}
-
-/**
-  Resets the entire platform.
-
-  @param[in] ResetType          The type of reset to perform.
-  @param[in] ResetStatus        The status code for the reset.
-  @param[in] DataSize           The size, in bytes, of ResetData.
-  @param[in] ResetData          For a ResetType of EfiResetCold, EfiResetWarm, or
-                                EfiResetShutdown the data buffer starts with a Null-terminated
-                                string, optionally followed by additional binary data.
-                                The string is a description that the caller may use to further
-                                indicate the reason for the system reset. ResetData is only
-                                valid if ResetStatus is something other than EFI_SUCCESS
-                                unless the ResetType is EfiResetPlatformSpecific
-                                where a minimum amount of ResetData is always required.
-**/
-VOID
-EFIAPI
-ResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN VOID             *ResetData OPTIONAL
-  )
-{
-  EFI_STATUS    Status;
-  UINTN         Size;
-  UINTN         CapsuleDataPtr;
-  
-  //
-  // Indicate reset system runtime service is called.
-  //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_RESET_SYSTEM));
-
-  switch (ResetType) {
-  case EfiResetWarm:
-
-    //
-    //Check if there are pending capsules to process
-    //
-    Size = sizeof (CapsuleDataPtr);
-    Status =  EfiGetVariable (
-                 EFI_CAPSULE_VARIABLE_NAME,
-                 &gEfiCapsuleVendorGuid,
-                 NULL,
-                 &Size,
-                 (VOID *) &CapsuleDataPtr
-                 );
-
-    if (Status == EFI_SUCCESS) {
-      //
-      //Process capsules across a system reset.
-      //
-      DoS3();
-    }
-
-    ResetWarm ();
-
-    break;
-
- case EfiResetCold:
-    ResetCold ();
-    break;
-
-  case EfiResetShutdown:
-    ResetShutdown ();
-    return ;
-
-  case EfiResetPlatformSpecific:
-    ResetPlatformSpecific (DataSize, ResetData);
-    return;
-
-  default:
-    return ;
+  // First, make sure that no one else has gotten here before us.
+  // It's no good having contention over who gets to handle a call.
+  Status = gBS->LocateProtocol( &gEfiResetArchProtocolGuid, NULL, &ResetArchProtocol );
+  // Note, we care if the protocol *is* installed, so we're checking to see if it succeeds. Uncommon logic.
+  if (!EFI_ERROR( Status ))
+  {
+    // We can safely bail here.
+    DEBUG(( DEBUG_ERROR, __FUNCTION__" - gEfiResetArchProtocolGuid is already installed!\n" ));
+    ASSERT( FALSE );
+    Status = EFI_ALREADY_STARTED;
+    goto Exit;
   }
 
   //
-  // Given we should have reset getting here would be bad
+  // If we're good to go, let's go ahead and hook gRT->ResetSystem.
+  PreviousHandler = SystemTable->RuntimeServices->ResetSystem;
+  SystemTable->RuntimeServices->ResetSystem = ResetSystemMain;
+  DEBUG(( DEBUG_INFO, __FUNCTION__" - gRT->ResetSystem hooked. New function is ResetSystemDxe::ResetSystemMain().\n" ));
+
   //
-  ASSERT (FALSE);
-}
+  // If we're successful thus far, let's notify that the reset is being handled.
+  DummyHandle = NULL;
+  Status = gBS->InstallMultipleProtocolInterfaces( &DummyHandle,
+                                                   &gEfiResetArchProtocolGuid,
+                                                   NULL,
+                                                   NULL );
+  if (EFI_ERROR( Status ))
+  {
+    DEBUG(( DEBUG_ERROR, __FUNCTION__" - Failed to install the gEfiResetArchProtocolGuid signal protocol! %r\n", Status ));
+  }
+
+Exit:
+  // If we're returning an error, we need to do everything possible to put things
+  // back the way they were. Can't leave any loose ends.
+  if (EFI_ERROR( Status ))
+  {
+    // If we have hooked the ResetSystem handler, replace it.
+    if (PreviousHandler != NULL)
+    {
+      SystemTable->RuntimeServices->ResetSystem = PreviousHandler;
+    }
+  }
+
+  return Status;
+} // ResetSystemDxeEntryPoint()

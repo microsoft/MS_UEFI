@@ -7,6 +7,7 @@
 # 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
 #
 # Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016, Microsoft Corporation
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +15,6 @@
 #  http://opensource.org/licenses/bsd-license.php
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
 #
 ##
 
@@ -71,6 +71,7 @@
   PeCoffLib
   PeiServicesTablePointerLib
   PcdLib
+  ResetSystemCoreLib
 
 [Guids]
   gPeiAprioriFileNameGuid       ## SOMETIMES_CONSUMES   ## File
@@ -84,7 +85,6 @@
   
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES # PeiReportStatusService is not ready if this PPI doesn't exist
-  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES # PeiResetService is not ready if this PPI doesn't exist 
   gEfiDxeIplPpiGuid                             ## CONSUMES
   gEfiPeiMemoryDiscoveredPpiGuid                ## PRODUCES
   gEfiPeiDecompressPpiGuid                      ## SOMETIMES_CONSUMES
@@ -100,7 +100,6 @@
   gEfiPeiSecurity2PpiGuid                       ## NOTIFY
   gEfiTemporaryRamSupportPpiGuid                ## SOMETIMES_CONSUMES
   gEfiTemporaryRamDonePpiGuid                   ## SOMETIMES_CONSUMES
-  gEfiPeiReset2PpiGuid                          ## SOMETIMES_CONSUMES
 
 [Pcd]  
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported                   ## CONSUMES

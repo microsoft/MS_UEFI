@@ -5,6 +5,8 @@
   the capsule runtime services are ready.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -31,6 +33,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/UefiResetSystemLib.h>
+
 //
 // Handle for the installation of Capsule Architecture Protocol.
 //
@@ -231,7 +235,7 @@ UpdateCapsule (
        // will initiate a reset of the platform which is compatible with the passed-in capsule request and will 
        // not return back to the caller.
        //
-       EfiResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+       LibResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
      }
   }
   return Status;

@@ -5,6 +5,8 @@
   protocol.
 
   Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016, Microsoft Corporation
+  
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1968,7 +1970,7 @@ CommandCommunication (
       SendAckPacket (DEBUG_COMMAND_OK);
       ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
 
-      ResetCold ();
+      LibResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
       //
       // Assume system resets in 2 seconds, otherwise send TIMEOUT packet.
       // PCD can be used if 2 seconds isn't long enough for some platforms.

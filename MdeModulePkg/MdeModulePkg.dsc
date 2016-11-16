@@ -3,6 +3,7 @@
 #
 # (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 # Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016, Microsoft Corporation
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -92,7 +93,7 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
-  ResetSystemLib|MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
+  UefiResetSystemLib|MdeModulePkg/Library/BaseUefiResetSystemLibNull/BaseUefiResetSystemLibNull.inf
   SmbusLib|MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
   S3BootScriptLib|MdeModulePkg/Library/PiDxeS3BootScriptLib/DxeS3BootScriptLib.inf
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
@@ -112,12 +113,15 @@
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  ResetSystemCoreLib|MdeModulePkg/Library/ResetSystemCoreLib/PeiResetSystemCoreLib.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/PeiResetHelperLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/PeiResetHelperLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -130,6 +134,7 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/DxeResetHelperLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -137,6 +142,8 @@
   DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+  ResetSystemCoreLib|MdeModulePkg/Library/ResetSystemCoreLib/DxeRuntimeResetSystemCoreLib.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/DxeResetHelperLib.inf
 
 [LibraryClasses.common.SMM_CORE]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -158,11 +165,13 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/DxeResetHelperLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   DebugLib|MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/DxeResetHelperLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
