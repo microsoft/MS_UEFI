@@ -1,4 +1,4 @@
- # Welcome to the MS_UEFI repository.  
+# Welcome to the MS_UEFI repository.  
 
 This repo is used as a public place to share common UEFI features and prototypes as we work to get fully integrated into the tianocore edk2 project.  
 
