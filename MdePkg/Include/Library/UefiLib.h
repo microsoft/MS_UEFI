@@ -13,6 +13,7 @@
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
 Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation.
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -729,6 +730,42 @@ GetVariable2 (
   OUT VOID           **Value,
   OUT UINTN          *Size OPTIONAL
   );
+
+
+
+/**
+Returns the status whether get the variable success. The function retrieves
+variable  through the UEFI Runtime Service GetVariable().  The
+returned buffer is allocated using AllocatePool().  The caller is responsible
+for freeing this buffer with FreePool().  The attributes are returned if
+the caller provides a valid Attribute parameter.
+
+If Name  is NULL, then ASSERT().
+If Guid  is NULL, then ASSERT().
+If Value is NULL, then ASSERT().
+
+@param[in]  Name  The pointer to a Null-terminated Unicode string.
+@param[in]  Guid  The pointer to an EFI_GUID structure
+@param[out] Value The buffer point saved the variable info.
+@param[out] Size  The buffer size of the variable.
+@param[out] Attr  The pointer to the variable attributes as found in var store
+
+@return EFI_OUT_OF_RESOURCES      Allocate buffer failed.
+@return EFI_SUCCESS               Find the specified variable.
+@return Others Errors             Return errors from call to gRT->GetVariable.
+
+**/
+EFI_STATUS
+EFIAPI
+GetVariable3(
+  IN CONST CHAR16    *Name,
+  IN CONST EFI_GUID  *Guid,
+  OUT VOID           **Value,
+  OUT UINTN          *Size OPTIONAL,
+  OUT UINT32         *Attr OPTIONAL
+  );
+
+
 
 /**
   Returns a pointer to an allocated buffer that contains the contents of a 
