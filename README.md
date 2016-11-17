@@ -1,8 +1,9 @@
-# Welcome to the MS_UEFI repository.  
+ # Welcome to the MS_UEFI repository.  
 
 This repo is used as a public place to share common UEFI features and prototypes as we work to get fully integrated into the tianocore edk2 project.  
 
-## Copyright
+## Copyright & License
+All Microsoft contributed code will contain a Microsoft Copyright and be licensed under a standard BSD 2 clause license (same as edk2)
 
 Copyright (c) 2016, Microsoft Corporation
 
