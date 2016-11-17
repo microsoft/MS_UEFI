@@ -2,6 +2,8 @@
   Ia32-specific functionality for DxeLoad.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
+#include <X64/ProcessorStructs.h>
 
 #define IDT_ENTRY_COUNT       32
 

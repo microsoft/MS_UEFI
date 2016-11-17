@@ -4,6 +4,8 @@
 
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -6936,6 +6938,21 @@ UINT16
 EFIAPI
 AsmReadTr (
   VOID
+  );
+
+/**
+  Writes the Task Register (TR).
+
+  Write the current value of TR. This function is only available on
+  IA-32 and x64.
+
+  @return The current value of TR.
+
+**/
+VOID
+EFIAPI
+AsmWriteTr (
+  UINT16
   );
 
 

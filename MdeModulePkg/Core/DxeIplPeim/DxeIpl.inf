@@ -6,6 +6,8 @@
 #  needed to run the DXE Foundation.
 #
 #  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016, Microsoft Corporation
+#
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +49,7 @@
 [Sources.X64]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
-  X64/DxeLoadFunc.c    
+  X64/DxeLoadFunc.c
 
 [Sources.IPF]
   Ipf/DxeLoadFunc.c

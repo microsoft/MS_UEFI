@@ -6,6 +6,8 @@
 # Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2016, Microsoft Corporation
+#
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -820,6 +822,49 @@
   # @ValidList  0x80000006 | 0x03058002
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable|0x03058002|UINT32|0x30001040
 
+  ## This flag defines whether Special Pool traps for buffer overrun, or buffer underrun
+  #  If this PCD is set to TRUE then the data is set a the end of a page, if FALSE, then the data is
+  #  set to the beginning of a page.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpecialPoolOverrun|TRUE|BOOLEAN|0x30001047
+
+  ## This flag defines whether Special Pool traps references to page 0
+  #  If this PCD is set to TRUE then any reference to memory from 0x0-0xfff will cause an exception.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpecialPoolTrapPage0|TRUE|BOOLEAN|0x30001048
+
+  ## This flag defines the lower address limit where Special Pool applies
+  # The start range starts at the 2MB boundary at or below the specified start range
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpecialPoolStartRange|0x00000000|UINT64|0x30001049
+
+  ## This flag defines the upper address limit where Special Pool applies
+  # The end range ends at the 2MB boundary at or above the specified end range
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpecialPoolEndRange|0x90000000|UINT64|0x3000104A
+
+  ## This flag defines the upper address limit where Special Pool applies
+  #
+  # Any of the following may be used, however, some will not make sense as only allocations
+  # by AllocatePool are monitored (ie AllocatePages is not monitored, at least not yet)
+  #
+  # EfiReservedMemoryType                       1
+  # EfiLoaderCode                               2
+  # EfiLoaderData                               4
+  # EfiBootServicesCode                         8
+  # EfiBootServicesData                        10
+  # EfiRuntimeServicesCode                     20
+  # EfiRuntimeServicesData                     40
+  # EfiConventionalMemory                      80
+  # EfiUnusableMemory                         100
+  # EfiACPIReclaimMemory                      200
+  # EfiACPIMemoryNVS                          400
+  # EfiMemoryMappedIO                         800
+  # EfiMemoryMappedIOPortSpace               1000
+  # EfiPalCode                               2000
+  # EfiPersistentMemory                      4000
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpecialPoolTypes|0x00000010|UINT32|0x3000104B
+
+  ## This flag enables or disables StackFault handing
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpecialPoolStackFaultHandling|TRUE|BOOLEAN|0x3000104C
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -1633,7 +1678,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|TRUE|BOOLEAN|0x01100000
 
   ## Specify memory size for boot script executor stack usage in S3 phase.
-  #  The default size 32K. When changing the value make sure the memory size is large enough 
+  #  The default size 32K. When changing the value make sure the memory size is large enough
   #  to meet boot script executor requirement in the S3 phase.
   # @Prompt Reserved S3 Boot Script Stack ACPI Memory Size
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize|0x8000|UINT32|0x02000000
