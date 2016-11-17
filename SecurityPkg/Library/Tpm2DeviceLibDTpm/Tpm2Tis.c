@@ -3,6 +3,8 @@
   
 Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) 2016, Microsoft Corporation
+
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -22,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/PcdLib.h>
+#include <Library/Tpm2DebugLib.h>
 
 #include <IndustryStandard/TpmTis.h>
 
@@ -225,24 +228,7 @@ Tpm2TisTpmCommand (
   UINT32                            Data32;
 
   DEBUG_CODE (
-    UINTN  DebugSize;
-
-    DEBUG ((EFI_D_VERBOSE, "Tpm2TisTpmCommand Send - "));
-    if (SizeIn > 0x100) {
-      DebugSize = 0x40;
-    } else {
-      DebugSize = SizeIn;
-    }
-    for (Index = 0; Index < DebugSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
-    }
-    if (DebugSize != SizeIn) {
-      DEBUG ((EFI_D_VERBOSE, "...... "));
-      for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-        DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
-      }
-    }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DumpTpmInputBlock( SizeIn, BufferIn );
   );
   TpmOutSize = 0;
 
@@ -316,13 +302,6 @@ Tpm2TisTpmCommand (
       if (Index == sizeof (TPM2_RESPONSE_HEADER)) break;
     }
   }
-  DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "Tpm2TisTpmCommand ReceiveHeader - "));
-    for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
-    }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
-  );
   //
   // Check the reponse data header (tag,parasize and returncode )
   //
@@ -361,11 +340,7 @@ Tpm2TisTpmCommand (
   }
 Exit:
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "Tpm2TisTpmCommand Receive - "));
-    for (Index = 0; Index < TpmOutSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
-    }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DumpTpmOutputBlock( TpmOutSize, BufferOut );
   );
   MmioWrite8((UINTN)&TisReg->Status, TIS_PC_STS_READY);
   return Status;

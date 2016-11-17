@@ -2,6 +2,8 @@
   PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/PcdLib.h>
+#include <Library/Tpm2DebugLib.h>
 
 #include <IndustryStandard/TpmPtp.h>
 #include <IndustryStandard/TpmTis.h>
@@ -162,24 +165,7 @@ PtpCrbTpmCommand (
   UINT32                            Data32;
 
   DEBUG_CODE (
-    UINTN  DebugSize;
-
-    DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand Send - "));
-    if (SizeIn > 0x100) {
-      DebugSize = 0x40;
-    } else {
-      DebugSize = SizeIn;
-    }
-    for (Index = 0; Index < DebugSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
-    }
-    if (DebugSize != SizeIn) {
-      DEBUG ((EFI_D_VERBOSE, "...... "));
-      for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-        DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
-      }
-    }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DumpTpmInputBlock( SizeIn, BufferIn );
   );
   TpmOutSize = 0;
 
@@ -257,13 +243,6 @@ PtpCrbTpmCommand (
   for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
     BufferOut[Index] = MmioRead8 ((UINTN)&CrbReg->CrbDataBuffer[Index]);
   }
-  DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand ReceiveHeader - "));
-    for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
-    }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
-  );
   //
   // Check the reponse data header (tag, parasize and returncode)
   //
@@ -290,11 +269,7 @@ PtpCrbTpmCommand (
   }
 Exit:
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand Receive - "));
-    for (Index = 0; Index < TpmOutSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
-    }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DumpTpmOutputBlock( TpmOutSize, BufferOut );
   );
 
   //
