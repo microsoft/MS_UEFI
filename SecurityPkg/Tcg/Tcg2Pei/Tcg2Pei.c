@@ -532,38 +532,31 @@ MeasureMainBios (
   EFI_PEI_FIRMWARE_VOLUME_PPI       *FvPpi;
 
   PERF_START_EX (mFileHandle, "EventRec", "Tcg2Pei", 0, PERF_ID_TCG2_PEI);
-  FvInstances    = 0;
-  while (TRUE) {
-    //
-    // Traverse all firmware volume instances of Static Core Root of Trust for Measurement
-    // (S-CRTM), this firmware volume measure policy can be modified/enhanced by special
-    // platform for special CRTM TPM measuring.
-    //
-    Status = PeiServicesFfsFindNextVolume (FvInstances, &VolumeHandle);
-    if (EFI_ERROR (Status)) {
-      break;
-    }
-  
-    //
-    // Measure and record the firmware volume that is dispatched by PeiCore
-    //
-    Status = PeiServicesFfsGetVolumeInfo (VolumeHandle, &VolumeInfo);
-    ASSERT_EFI_ERROR (Status);
-    //
-    // Locate the corresponding FV_PPI according to founded FV's format guid
-    //
-    Status = PeiServicesLocatePpi (
-               &VolumeInfo.FvFormat, 
-               0, 
-               NULL,
-               (VOID**)&FvPpi
-               );
-    if (!EFI_ERROR (Status)) {
-      MeasureFvImage ((EFI_PHYSICAL_ADDRESS) (UINTN) VolumeInfo.FvStart, VolumeInfo.FvSize);
-    }
+  FvInstances    = 0;   // only get the boot FV; rest of FVs are handled correctly in the callback
 
-    FvInstances++;
+  Status = PeiServicesFfsFindNextVolume (FvInstances, &VolumeHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  //
+  // Measure and record the boot firmware volume that is dispatched by PeiCore
+  //
+  Status = PeiServicesFfsGetVolumeInfo (VolumeHandle, &VolumeInfo);
+  ASSERT_EFI_ERROR (Status);
+  //
+  // Locate the corresponding FV_PPI according to founded FV's format guid
+  //
+  Status = PeiServicesLocatePpi (
+             &VolumeInfo.FvFormat, 
+             0, 
+             NULL,
+             (VOID**)&FvPpi
+             );
+  if (!EFI_ERROR (Status)) {
+      MeasureFvImage ((EFI_PHYSICAL_ADDRESS) (UINTN) VolumeInfo.FvStart, VolumeInfo.FvSize);
+  }
+
   PERF_END_EX (mFileHandle, "EventRec", "Tcg2Pei", 0, PERF_ID_TCG2_PEI + 1);
 
   return EFI_SUCCESS;
