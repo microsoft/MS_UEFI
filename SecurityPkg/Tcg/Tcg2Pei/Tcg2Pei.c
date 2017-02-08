@@ -2,6 +2,7 @@
   Initialize TPM2 device and measure FVs before handing off control to DXE.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -22,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/FirmwareVolume.h>
 #include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
+#include <Ppi/FirmwareVolumeInfoPrehashedFV.h>
 
 #include <Guid/TcgEventHob.h>
 #include <Guid/MeasuredFvHob.h>
@@ -134,6 +136,7 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
 };
 
 EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI *mMeasurementExcludedFvPpi;
+PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI             *mPrehashedFVsPpi;
 
 /**
   Record all measured Firmware Volum Information into a Guid Hob
@@ -433,6 +436,69 @@ MeasureCRTMVersion (
 }
 
 /**
+  Add FV's prehashed value to the DigestList if the  
+  corresponding hash alg supported by the hash algorithm mask.  
+
+  @param PrehashedFvPpi  PrehashedFvPpi.
+  @param FvBase          FV base address.
+  @param DigestList      Digest list.
+
+  @retval EFI_SUCCESS    Prehashed value added succesfully. 
+  @retval EFI_ABORTED    Aborted because an error found.
+**/
+EFI_STATUS
+CheckPrehashedFVs (
+  IN      PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI  *PrehashedFvPpi,
+  IN      EFI_PHYSICAL_ADDRESS                       FvBase,
+  IN OUT  TPML_DIGEST_VALUES                         *DigestList
+  )
+{
+  UINT32                                 Index;
+  UINT32                                 DigestListIndex;
+  PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV  *PrehashedFvEntry = (PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV *)(PrehashedFvPpi + 1);
+
+  for (Index = 0; Index < PrehashedFvPpi->Count; Index++)
+  {
+    if (PrehashedFvEntry->FvBase == FvBase) {
+      //
+      // FV is prehashed, add it to the DigestList
+      //
+      if (IsHashAlgSupportedInHashAlgorithmMask(PrehashedFvEntry->HashAlgoId, PcdGet32 (PcdTpm2HashMask)))
+      {
+        for (DigestListIndex = 0; DigestListIndex < DigestList->count; DigestListIndex++) {
+          if (DigestList->digests[DigestListIndex].hashAlg == PrehashedFvEntry->HashAlgoId) {
+            DEBUG ((DEBUG_ERROR, "The FV which had multiple prehashes with the same hash algorithm starts at: 0x%x\n", FvBase));
+            DEBUG ((DEBUG_ERROR, "The hash algorithm is: 0x%x\n", PrehashedFvEntry->HashAlgoId));
+
+            if (CompareMem(&DigestList->digests[DigestListIndex].digest, PrehashedFvEntry->FvHash, PrehashedFvEntry->HashSize) != 0) {
+              DEBUG ((DEBUG_ERROR, "The two hash values are different.\n"));
+              return EFI_DEVICE_ERROR;
+            }
+
+            // Exit the loop, this FV's hash will not be added to the DigestList because it already exists in DigestList
+            break;
+          }
+        }
+
+        if (DigestListIndex >= DigestList->count) {
+          DEBUG((DEBUG_INFO, "The prehashed FV added to the DigestList starts at: 0x%x\n", FvBase));
+
+          DigestList->digests[DigestList->count].hashAlg = PrehashedFvEntry->HashAlgoId;
+          CopyMem(&DigestList->digests[DigestList->count].digest, PrehashedFvEntry->FvHash, PrehashedFvEntry->HashSize);
+          DigestList->count++;
+        }
+      }
+    }
+
+    PrehashedFvEntry = (PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV *)((UINT8 *)PrehashedFvEntry + sizeof(PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV) \
+                                                                 + PrehashedFvEntry->HashSize);
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+/**
   Measure FV image. 
   Add it into the measured FV list after the FV is measured successfully. 
 
@@ -455,29 +521,110 @@ MeasureFvImage (
   EFI_STATUS                        Status;
   EFI_PLATFORM_FIRMWARE_BLOB        FvBlob;
   TCG_PCR_EVENT_HDR                 TcgEventHdr;
+  UINT32                            Instance = 0;
+  TPML_DIGEST_VALUES                DigestList;
 
   //
-  // Check if it is in Excluded FV list
+  // Check if it is in Excluded FV lists
   //
-  if (mMeasurementExcludedFvPpi != NULL) {
-    for (Index = 0; Index < mMeasurementExcludedFvPpi->Count; Index ++) {
-      if (mMeasurementExcludedFvPpi->Fv[Index].FvBase == FvBase) {
-        DEBUG ((DEBUG_INFO, "The FV which is excluded by Tcg2Pei starts at: 0x%x\n", FvBase));
-        DEBUG ((DEBUG_INFO, "The FV which is excluded by Tcg2Pei has the size: 0x%x\n", FvLength));
-        return EFI_SUCCESS;
+  do {
+    Status = PeiServicesLocatePpi(
+                 &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid, 
+                 Instance, 
+                 NULL,
+                 (VOID**)&mMeasurementExcludedFvPpi
+                 );
+    if (!EFI_ERROR(Status) && mMeasurementExcludedFvPpi != NULL) {
+      for (Index = 0; Index < mMeasurementExcludedFvPpi->Count; Index ++) {
+        if (mMeasurementExcludedFvPpi->Fv[Index].FvBase == FvBase) {
+          DEBUG ((DEBUG_INFO, "The FV which is excluded by Tcg2Pei starts at: 0x%x\n", FvBase));
+          DEBUG ((DEBUG_INFO, "The FV which is excluded by Tcg2Pei has the size: 0x%x\n", FvLength));
+          return EFI_SUCCESS;
+        }
       }
+
+      Instance++;
     }
-  }
+  } while (!EFI_ERROR(Status));
 
   //
   // Check whether FV is in the measured FV list.
   //
   for (Index = 0; Index < mMeasuredBaseFvIndex; Index ++) {
     if (mMeasuredBaseFvInfo[Index].BlobBase == FvBase) {
+      DEBUG ((DEBUG_INFO, "The FV which is already measured by Tcg2Pei starts at: 0x%x\n", FvBase));
+      DEBUG ((DEBUG_INFO, "The FV which is already measured by Tcg2Pei has the size: 0x%x\n", FvLength));
       return EFI_SUCCESS;
     }
   }
-  
+
+  Instance = 0;
+  ZeroMem (&DigestList, sizeof(DigestList));
+
+  //
+  // Check if the FV is already hashed
+  //
+  do {
+    Status = PeiServicesLocatePpi (
+                 &gPeiFirmwareVolumeInfoPrehashedFvPpiGuid, 
+                 Instance, 
+                 NULL,
+                 (VOID**)&mPrehashedFVsPpi
+                 );    
+
+    //
+    // If the FV is prehashed, add it to the DigestList
+    //
+    if (!EFI_ERROR(Status) && mPrehashedFVsPpi != NULL)
+    {
+      Status = CheckPrehashedFVs(mPrehashedFVsPpi, FvBase, &DigestList);
+      if (EFI_ERROR(Status)) {
+        DEBUG ((DEBUG_ERROR, "CheckPrehashedFVs failed.  Status=%r\n", Status));
+        ZeroMem (&DigestList, sizeof(DigestList));     // zero-out DigestList on this error only
+      }
+
+      Instance++;
+    }
+  } while (!EFI_ERROR(Status));
+
+  for (Index = 0; Index < DigestList.count; Index++) {
+    DEBUG((DEBUG_INFO, "Hash Algo in DigesList=0x%x\n", DigestList.digests[Index].hashAlg)); 
+  }
+
+  if (DigestList.count > 0 && IsDigestListInSyncWithHashAlgorithmMask(&DigestList, PcdGet32 (PcdTpm2HashMask)))
+  {
+    //
+    // Only extend DigestList to PCR and log it into TCG event log
+    //
+    Status = Tpm2PcrExtend(
+             0,                    // PCR 0
+             &DigestList
+             );
+    if (EFI_ERROR(Status))
+    {
+      DEBUG ((DEBUG_ERROR, "The FV which failed to be extended starts at: 0x%x\n", FvBase));
+      return Status; 
+    }
+
+    FvBlob.BlobBase   = FvBase;
+    FvBlob.BlobLength = FvLength;
+    TcgEventHdr.PCRIndex  = 0;
+    TcgEventHdr.EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB;
+    TcgEventHdr.EventSize = sizeof (FvBlob);
+
+    Status = LogHashEvent (&DigestList, &TcgEventHdr, (UINT8*) &FvBlob);
+    if (EFI_ERROR(Status))
+    {
+      DEBUG ((DEBUG_ERROR, "The FV which failed to be logged starts at: 0x%x\n", FvBase));
+      return Status; 
+    }
+
+    goto MeasuredFvList;
+  }
+  else {
+    DEBUG ((DEBUG_INFO, "DigestList is invalid.\n"));
+  }
+
   //
   // Measure and record the FV to the TPM
   //
@@ -498,7 +645,12 @@ MeasureFvImage (
              &TcgEventHdr,
              (UINT8*) &FvBlob
              );
+  if (EFI_ERROR(Status)) {
+    DEBUG ((DEBUG_ERROR, "The FV which failed to be HashLogExtended starts at: 0x%x.  Status=%r\n", FvBase, Status));
+    return Status; 
+  }
 
+MeasuredFvList:
   //
   // Add new FV into the measured FV list.
   //
@@ -643,14 +795,6 @@ PeimEntryMP (
   )
 {
   EFI_STATUS                        Status;
-
-  Status = PeiServicesLocatePpi (
-               &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid, 
-               0, 
-               NULL,
-               (VOID**)&mMeasurementExcludedFvPpi
-               );
-  // Do not check status, because it is optional
 
   mMeasuredBaseFvInfo  = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
   ASSERT (mMeasuredBaseFvInfo != NULL);

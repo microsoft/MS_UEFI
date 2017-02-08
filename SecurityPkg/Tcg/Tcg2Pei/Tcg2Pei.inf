@@ -4,6 +4,7 @@
 #  This module will initialize TPM device, measure reported FVs and BIOS version.
 #
 # Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -67,6 +68,7 @@
   gEfiPeiFirmwareVolumeInfoPpiGuid                                     ## SOMETIMES_CONSUMES     ## NOTIFY
   gEfiPeiFirmwareVolumeInfo2PpiGuid                                    ## SOMETIMES_CONSUMES     ## NOTIFY
   gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid                  ## SOMETIMES_CONSUMES
+  gPeiFirmwareVolumeInfoPrehashedFvPpiGuid                             ## SOMETIMES_CONSUMES
   gPeiTpmInitializedPpiGuid                                            ## SOMETIMES_PRODUCES
   gPeiTpmInitializationDonePpiGuid                                     ## PRODUCES
   gEfiEndOfPeiSignalPpiGuid                                            ## SOMETIMES_CONSUMES     ## NOTIFY

@@ -2,6 +2,7 @@
   This library is used by other modules to send TPM2 command.
 
 Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1052,6 +1053,37 @@ GetDigestFromDigestList(
   IN TPMI_ALG_HASH      HashAlg,
   IN TPML_DIGEST_VALUES *DigestList,
   OUT VOID              *Digest
+  );
+
+/**
+  Return if hash alg is supported in HashAlgorithmMask.
+
+  @param HashAlg            Hash algorithm to be checked.
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  Hash algorithm is supported.
+  @retval FALSE Hash algorithm is not supported.
+**/
+BOOLEAN
+IsHashAlgSupportedInHashAlgorithmMask(
+  IN TPMI_ALG_HASH  HashAlg,
+  IN UINT32         HashAlgorithmMask
+  );
+
+/**
+  Check if all hash algorithms supported in HashAlgorithmMask are 
+  present in the DigestList.
+
+  @param DigestList         Digest list
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  All hash algorithms present.
+  @retval FALSE Some hash algorithms not present.
+**/
+BOOLEAN
+IsDigestListInSyncWithHashAlgorithmMask(
+  IN TPML_DIGEST_VALUES *DigestList,
+  IN UINT32             HashAlgorithmMask
   );
 
 #endif
