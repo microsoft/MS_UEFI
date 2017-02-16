@@ -3,6 +3,8 @@
   
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) 2017, Microsoft Corporation.
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -10,8 +12,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-Copyright (c) 2017, Microsoft Corporation.
 
 **/
 
@@ -22,7 +22,6 @@ Copyright (c) 2017, Microsoft Corporation.
 ///
 #define INIT_CAR_VALUE 0x5AA55AA5
 
-//MSCHANGE Delayed Dispatch begin
 EFI_DELAYED_DISPATCH_PPI           mDelayedDispatchPpi = {PeiDelayedDispatchRegister};
 EFI_PEI_PPI_DESCRIPTOR             mDelayedDispatchDesc = {
       (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
@@ -158,7 +157,6 @@ PeiDelayedDispatchOnEndOfPei (
     }
     return EFI_SUCCESS;
 }
-//MSCHANGE Delayed Dispatch end
 
 /**
 
@@ -1082,14 +1080,14 @@ PeiDispatcher (
   EFI_PEI_FILE_HANDLE                 SaveCurrentFileHandle;
   EFI_FV_FILE_INFO                    FvFileInfo;
   PEI_CORE_FV_HANDLE                  *CoreFvHandle;
-  EFI_HOB_GUID_TYPE                   *GuidHob;                            // MSCHANGE
+  EFI_HOB_GUID_TYPE                   *GuidHob;
   
   PeiServices = (CONST EFI_PEI_SERVICES **) &Private->Ps;
   PeimEntryPoint = NULL;
   PeimFileHandle = NULL;
   EntryPoint     = 0;
 
-  if (NULL == Private->DelayedDispatchTable) {                            // MSCHANGE Start
+  if (NULL == Private->DelayedDispatchTable) {
     GuidHob = GetFirstGuidHob(&gEfiDelayedDispatchTableGuid);
     if (NULL != GuidHob) {
       Private->DelayedDispatchTable = (DELAYED_DISPATCH_TABLE *)(GET_GUID_HOB_DATA(GuidHob));
@@ -1102,7 +1100,7 @@ PeiDispatcher (
         Status = PeiServicesNotifyPpi (&mDelayedDispatchNotifyDesc);
         ASSERT_EFI_ERROR (Status);
       }
-    }                                                                    // MSCHANGE End
+    }
   }
 
   if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
@@ -1336,13 +1334,11 @@ PeiDispatcher (
           }
         }
 
-        // MSCHANGE Start - Dispatch pending delalyed dispatch requests
         if (NULL != Private->DelayedDispatchTable) {
             if (DelayedDispatchDispatcher (Private->DelayedDispatchTable)) {
                 ProcessNotifyList(Private);
             }
         }
-        // MSCHANGE end
       }
 
       //

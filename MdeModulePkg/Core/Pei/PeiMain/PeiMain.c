@@ -2,6 +2,8 @@
   Pei Core Main Entry Point
   
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, Microsoft Corporation.
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -207,7 +209,7 @@ PeiCore (
         OldCoreData->FileHandles          = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->FileHandles - OldCoreData->HeapOffset);
       }
 
-      OldCoreData->DelayedDispatchTable = NULL;  // MSCHANGE - Force relocating the dispatch table
+      OldCoreData->DelayedDispatchTable = NULL;
 
       //
       // Initialize libraries that the PEI Core is linked against

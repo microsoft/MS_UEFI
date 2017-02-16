@@ -2,6 +2,8 @@
   Definition of Pei Core Structures and Services
   
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, Microsoft Corporation.
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,8 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiPei.h>
 #include <Ppi/DxeIpl.h>
-#include <Ppi/DelayedDispatch.h>    //MSCHANGE
-#include <Ppi/EndOfPeiPhase.h>      //MSCHANGE
+#include <Ppi/DelayedDispatch.h>
+#include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/StatusCode.h>
 #include <Ppi/Reset.h>
@@ -47,7 +49,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/PeImage.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/TimerLib.h>       // MSCHANGE
+#include <Library/TimerLib.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/FirmwareFileSystem3.h>
 #include <Guid/AprioriFileName.h>
@@ -180,7 +182,6 @@ EFI_STATUS
 
 #define PEI_CORE_HANDLE_SIGNATURE  SIGNATURE_32('P','e','i','C')
 
-//MSCHANGE Start
 #define MAX_DELAYED_DISPATCH_ENTRIES 8
 
 typedef struct {
@@ -195,7 +196,6 @@ typedef struct {
     UINT32                        DispCount;
     DELAYED_DISPATCH_ENTRY        Entry[MAX_DELAYED_DISPATCH_ENTRIES];
 } DELAYED_DISPATCH_TABLE;
-//MSCHANGE End
 
 ///
 /// Pei Core private data structure instance
@@ -286,7 +286,7 @@ struct _PEI_CORE_INSTANCE {
   //
   HOLE_MEMORY_DATA                  HoleData[HOLE_MAX_NUMBER];
 
-  DELAYED_DISPATCH_TABLE            *DelayedDispatchTable;    // MSCHANGE
+  DELAYED_DISPATCH_TABLE            *DelayedDispatchTable;
 };
 
 ///
@@ -1764,7 +1764,6 @@ PeiReinitializeFv (
   IN  PEI_CORE_INSTANCE           *PrivateData
   );
       
-// MSCHANGE Start
 /**
  * Delayed Dispatch Ppi function
  *
@@ -1796,6 +1795,5 @@ PeiDelayedDispatchOnEndOfPei (
     IN EFI_PEI_NOTIFY_DESCRIPTOR          *NotifyDesc,
     IN VOID                               *Ppi
 );
-// MSCHANGE End
 
 #endif
