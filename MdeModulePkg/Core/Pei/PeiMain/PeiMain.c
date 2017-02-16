@@ -207,6 +207,8 @@ PeiCore (
         OldCoreData->FileHandles          = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->FileHandles - OldCoreData->HeapOffset);
       }
 
+      OldCoreData->DelayedDispatchTable = NULL;  // MSCHANGE - Force relocating the dispatch table
+
       //
       // Initialize libraries that the PEI Core is linked against
       //
