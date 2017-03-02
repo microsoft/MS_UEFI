@@ -31,7 +31,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #define XML_MAX_ATTRIBUTE_VALUE_LENGTH	(1024)
-#define XML_MAX_ELEMENT_VALUE_LENGTH	(4096)
+#define XML_MAX_ELEMENT_VALUE_LENGTH	(0xFFFF)
 
 /**
 This function will create a xml tree given an XML document as a ascii string.

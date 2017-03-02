@@ -1430,7 +1430,7 @@ _GetXmlUnEscapedLength(
 
   if (Len > MaxStringLength)
   {
-    DEBUG((DEBUG_ERROR, __FUNCTION__ " String is too big or not NULL terminated\n"));
+    DEBUG((DEBUG_ERROR, __FUNCTION__ " String is too big or not NULL terminated.  MaxLen = 0x%LX\n", (UINT64)MaxStringLength));
     ASSERT(Len <= MaxStringLength);
     return 0;
   }

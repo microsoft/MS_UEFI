@@ -32,6 +32,7 @@
 
 #define MAX_STRING_LENGTH (0xFFFF)
 
+#define DATA_TO_BIG  ("DATA AS STRING EXCEEDS MAX LENGTH")
 
 //Helper functions
  
@@ -246,7 +247,7 @@ New_VariableNodeInList(
 
   //Create the guid attribute
   *AsciiString = '\0';
-  AsciiSPrint(AsciiString, MAX_STRING_LENGTH + 1, "%g", VarGuid);
+  AsciiSPrint(AsciiString, MAX_STRING_LENGTH, "%g", VarGuid);
   Status = AddAttributeToNode(NewVarNode, VAR_GUID_ATTRIBUTE_NAME, AsciiString);
   if (EFI_ERROR(Status))
   {
@@ -263,49 +264,49 @@ New_VariableNodeInList(
 
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == EFI_VARIABLE_NON_VOLATILE) 
   {
-    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " NV");
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " NV");
     Attributes ^= EFI_VARIABLE_NON_VOLATILE;
   }
 
   if ((Attributes & EFI_VARIABLE_BOOTSERVICE_ACCESS) == EFI_VARIABLE_BOOTSERVICE_ACCESS)
   {
-    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " BS");
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " BS");
     Attributes ^= EFI_VARIABLE_BOOTSERVICE_ACCESS;
   }
 
   if ((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == EFI_VARIABLE_RUNTIME_ACCESS) 
   {
-    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " RT");
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " RT");
     Attributes ^= EFI_VARIABLE_RUNTIME_ACCESS;
   }
 
   if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) 
   {
-    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " HW-Error");
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " HW-Error");
     Attributes ^= EFI_VARIABLE_HARDWARE_ERROR_RECORD;
   }
 
   if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) 
   {
-    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " Auth-WA");
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " Auth-WA");
     Attributes ^= EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
   }
   
   if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
   {
-    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " Auth-TIME-WA");
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " Auth-TIME-WA");
     Attributes ^= EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   }
   
   if ((Attributes & EFI_VARIABLE_APPEND_WRITE) == EFI_VARIABLE_APPEND_WRITE)
   {
-	AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " APPEND-W");
+	AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " APPEND-W");
 	Attributes ^= EFI_VARIABLE_APPEND_WRITE;
   }
   //Show ?? if attributes contained bit set of unknown type
   if (Attributes != 0)
   {
-    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH + 1, " ?????");
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " ?????");
   }
 
   Status = AddNode(NewVarNode, VAR_ATTRIBUTES_ELEMENT_NAME, AsciiString, &TempNode);
@@ -326,20 +327,23 @@ New_VariableNodeInList(
   }
 
   *AsciiString = '\0';
-  //convert the data into hex bytes
-  if (DataSize * 2 > MAX_STRING_LENGTH)
+  if (DataSize * 2 < MAX_STRING_LENGTH)
   {
-    DEBUG((DEBUG_ERROR, "%a - Data Size Too Large for String conversion 0x%X\n", __FUNCTION__, DataSize * 2));
-    goto ERROR_EXIT;
-  }
+    //convert the data into hex bytes
 
   for (i = 0; i < DataSize; i++)
   {
     AsciiValueToString((AsciiString + (i * 2)), (RADIX_HEX | PREFIX_ZERO), (INT64)Data[i], 2);
   }
+    Status = AddNode(NewVarNode, VAR_DATA_ELEMENT_NAME, AsciiString, &TempNode);
+  }
+  else
+  {
+    DEBUG((DEBUG_INFO, "%a - Data Size Too Large for String conversion 0x%X\n", __FUNCTION__, DataSize * 2));
+    Status = AddNode(NewVarNode, VAR_DATA_ELEMENT_NAME, DATA_TO_BIG, &TempNode);
+  }
     
 
-  Status = AddNode(NewVarNode, VAR_DATA_ELEMENT_NAME, AsciiString, &TempNode);
   if (EFI_ERROR(Status))
   {
     DEBUG((DEBUG_ERROR, "%a - AddNode for Data Failed.  Status %r\n", __FUNCTION__, Status));
