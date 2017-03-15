@@ -30,6 +30,7 @@
 
 [Sources]
   PlatformData.c
+  PlatformMisc.c
   PlatformBootManager.c
   PlatformBootManager.h
   MemoryTest.c

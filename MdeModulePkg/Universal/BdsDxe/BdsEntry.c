@@ -73,6 +73,9 @@ BdsDxeOnConnectConInCallBack (
 {
   EFI_STATUS Status;
 
+  // Inform platform of duties to perform before connecting consoles.   // MSCHANGE
+  PlatformBootManagerOnDemandConInConnect ();                           // MSCHANGE
+
   //
   // When Osloader call ReadKeyStroke to signal this event
   // no driver dependency is assumed existing. So use a non-dispatch version
@@ -397,6 +400,8 @@ BootBootOptions (
     //
     EfiBootManagerBoot (&BootOptions[Index]);
 
+    PlatformBootManagerProcessBootCompletion (&BootOptions[Index]);        // MSCHANGE 00076 - record boot status
+
     //
     // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware
     // supports boot manager menu, and if firmware is configured to boot in an
@@ -547,11 +552,14 @@ BdsFormalizeOSIndicationVariable (
   //
   Status = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
   if (Status != EFI_NOT_FOUND) {
-    OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+    OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;            // MSCHANGE
     EfiBootManagerFreeLoadOption (&BootManagerMenu);
   } else {
-    OsIndicationSupport = EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+    OsIndicationSupport = 0;                                           // MSCHANGE
   }
+  if (PcdGetBool(PcdPlatformRecoverySupported)) {                      // MSCHANGE
+    OsIndicationSupport |= EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY; // MSCHANGE
+  }                                                                    // MSCHANGE
 
   Status = gRT->SetVariable (
                   EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME,
@@ -726,6 +734,8 @@ BdsEntry (
   PERF_START (NULL, "BDS", NULL, 0);
   DEBUG ((EFI_D_INFO, "[Bds] Entry...\n"));
 
+  PlatformBootManagerBdsEntry ();             // MSCHANGE 00076 - Signal start of BDS
+
   PERF_CODE (
     BdsAllocateMemoryForPerformanceData ();
   );
@@ -829,41 +839,43 @@ BdsEntry (
   //
   InitializeLanguage (TRUE);
 
-  //
-  // System firmware must include a PlatformRecovery#### variable specifying
-  // a short-form File Path Media Device Path containing the platform default
-  // file path for removable media
-  //
-  FilePath = FileDevicePath (NULL, EFI_REMOVABLE_MEDIA_FILE_NAME);
-  Status = EfiBootManagerInitializeLoadOption (
-             &LoadOption,
-             LoadOptionNumberUnassigned,
-             LoadOptionTypePlatformRecovery,
-             LOAD_OPTION_ACTIVE,
-             L"Default PlatformRecovery",
-             FilePath,
-             NULL,
-             0
-             );
-  ASSERT_EFI_ERROR (Status);
-  LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
-  if (EfiBootManagerFindLoadOption (&LoadOption, LoadOptions, LoadOptionCount) == -1) {
-    for (Index = 0; Index < LoadOptionCount; Index++) {
+  if (PcdGetBool(PcdPlatformRecoverySupported)) {      //MSCHANGE
       //
-      // The PlatformRecovery#### options are sorted by OptionNumber.
-      // Find the the smallest unused number as the new OptionNumber.
+      // System firmware must include a PlatformRecovery#### variable specifying
+      // a short-form File Path Media Device Path containing the platform default
+      // file path for removable media
       //
-      if (LoadOptions[Index].OptionNumber != Index) {
-        break;
+      FilePath = FileDevicePath (NULL, EFI_REMOVABLE_MEDIA_FILE_NAME);
+      Status = EfiBootManagerInitializeLoadOption (
+                 &LoadOption,
+                 LoadOptionNumberUnassigned,
+                 LoadOptionTypePlatformRecovery,
+                 LOAD_OPTION_ACTIVE,
+                 L"Default PlatformRecovery",
+                 FilePath,
+                 NULL,
+                 0
+                 );
+      ASSERT_EFI_ERROR (Status);
+      LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
+      if (EfiBootManagerFindLoadOption (&LoadOption, LoadOptions, LoadOptionCount) == -1) {
+        for (Index = 0; Index < LoadOptionCount; Index++) {
+          //
+          // The PlatformRecovery#### options are sorted by OptionNumber.
+          // Find the the smallest unused number as the new OptionNumber.
+          //
+          if (LoadOptions[Index].OptionNumber != Index) {
+            break;
+          }
+        }
+        LoadOption.OptionNumber = Index;
+        Status = EfiBootManagerLoadOptionToVariable (&LoadOption);
+        ASSERT_EFI_ERROR (Status);
       }
-    }
-    LoadOption.OptionNumber = Index;
-    Status = EfiBootManagerLoadOptionToVariable (&LoadOption);
-    ASSERT_EFI_ERROR (Status);
-  }
-  EfiBootManagerFreeLoadOption (&LoadOption);
-  FreePool (FilePath);
-  EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+      EfiBootManagerFreeLoadOption (&LoadOption);
+      FreePool (FilePath);
+      EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+  }                                                   //MSCHANGE
 
   //
   // Report Status Code to indicate connecting drivers will happen
@@ -886,6 +898,7 @@ BdsEntry (
                     &gConnectConInEvent
                     );
     if (EFI_ERROR (Status)) {
+      DEBUG((DEBUG_ERROR,"CreateConInCallback Event failed - Code=%r\n",Status));  // MSCHANGE
       gConnectConInEvent = NULL;
     }
   }
@@ -1047,6 +1060,8 @@ BdsEntry (
 
     EfiBootManagerHotkeyBoot ();
 
+    PlatformBootManagerPriorityBoot (&BootNext);          // MSCHANGE 00076  Check for hard button boot selection
+
     //
     // Boot to "BootNext"
     //
@@ -1055,6 +1070,7 @@ BdsEntry (
       Status = EfiBootManagerVariableToLoadOption (BootNextVariableName, &LoadOption);
       if (!EFI_ERROR (Status)) {
         EfiBootManagerBoot (&LoadOption);
+        PlatformBootManagerProcessBootCompletion (&LoadOption);        // MSCHANGE 00076 - record boot status
         EfiBootManagerFreeLoadOption (&LoadOption);
         if ((LoadOption.Status == EFI_SUCCESS) && 
             (BootManagerMenuStatus != EFI_NOT_FOUND) &&
@@ -1089,6 +1105,9 @@ BdsEntry (
   }
 
   DEBUG ((EFI_D_ERROR, "[Bds] Unable to boot!\n"));
+
+  PlatformBootManagerDeadloop ();    // MSCHANGE
+
   CpuDeadLoop ();
 }
 
