@@ -1,7 +1,7 @@
 /** @file
   Support using XML as the File format for var report data
 
-  Copyright (c) 2016, Microsoft Corporation
+  Copyright (c) 2017, Microsoft Corporation
 
   All rights reserved.
   Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,10 @@
 #define LIST_XML_TEMPLATE "<?xml version=\"1.0\" encoding=\"utf-8\"?><Variables></Variables>"
 #define READY_XML_TEMPLATE "<ReadyToBoot></ReadyToBoot>"
 
-#define MAX_STRING_LENGTH (0xFFFF)
+#define MAX_STRING_LENGTH (0x10000)
 
 #define DATA_TO_BIG  ("DATA AS STRING EXCEEDS MAX LENGTH")
+
 
 //Helper functions
  
@@ -171,7 +172,6 @@ EXIT:
     return Status;
 }
 
-#define NUM_OF_PAGES (16)
 /**
 Creates a new XmlNode for a var and adds it to the list
 
@@ -199,7 +199,7 @@ New_VariableNodeInList(
   EFI_STATUS Status; 
   UINTN     i;
 
-  AsciiString = AllocatePages(NUM_OF_PAGES);  //allocate 64kb
+  AsciiString = AllocatePages(EFI_SIZE_TO_PAGES(MAX_STRING_LENGTH));  //allocate 64kb
   if (AsciiString == NULL)
   {
     DEBUG((DEBUG_ERROR, "%a - Failed to allocate 64kb for string conversion\n", __FUNCTION__));
@@ -300,8 +300,8 @@ New_VariableNodeInList(
   
   if ((Attributes & EFI_VARIABLE_APPEND_WRITE) == EFI_VARIABLE_APPEND_WRITE)
   {
-	AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " APPEND-W");
-	Attributes ^= EFI_VARIABLE_APPEND_WRITE;
+    AsciiStrCatS(AsciiString, MAX_STRING_LENGTH, " APPEND-W");
+    Attributes ^= EFI_VARIABLE_APPEND_WRITE;
   }
   //Show ?? if attributes contained bit set of unknown type
   if (Attributes != 0)
@@ -330,11 +330,10 @@ New_VariableNodeInList(
   if (DataSize * 2 < MAX_STRING_LENGTH)
   {
     //convert the data into hex bytes
-
-  for (i = 0; i < DataSize; i++)
-  {
-    AsciiValueToString((AsciiString + (i * 2)), (RADIX_HEX | PREFIX_ZERO), (INT64)Data[i], 2);
-  }
+    for (i = 0; i < DataSize; i++)
+    {
+      AsciiValueToString((AsciiString + (i * 2)), (RADIX_HEX | PREFIX_ZERO), (INT64)Data[i], 2);
+    }
     Status = AddNode(NewVarNode, VAR_DATA_ELEMENT_NAME, AsciiString, &TempNode);
   }
   else
@@ -342,8 +341,8 @@ New_VariableNodeInList(
     DEBUG((DEBUG_INFO, "%a - Data Size Too Large for String conversion 0x%X\n", __FUNCTION__, DataSize * 2));
     Status = AddNode(NewVarNode, VAR_DATA_ELEMENT_NAME, DATA_TO_BIG, &TempNode);
   }
-    
 
+  
   if (EFI_ERROR(Status))
   {
     DEBUG((DEBUG_ERROR, "%a - AddNode for Data Failed.  Status %r\n", __FUNCTION__, Status));
@@ -362,7 +361,7 @@ New_VariableNodeInList(
 
 ERROR_EXIT:
   if (NewVarNode != NULL)    { FreeXmlTree(&NewVarNode);  }
-  if (AsciiString != NULL) { FreePages(AsciiString, NUM_OF_PAGES); }
+  if (AsciiString != NULL) { FreePages(AsciiString, EFI_SIZE_TO_PAGES(MAX_STRING_LENGTH)); }
 
   return NewVarNode;
 }

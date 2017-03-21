@@ -38,5 +38,11 @@ shell and creates an XML file.
 Python 2.7 script that can be run from the Windows OS.  It takes the UEFI created
 XML file as input and then queries all listed variables and updates the XML with 
 access and status codes.  This gives additional verification for variables that 
-may employ late locking or other protections from OS access.  
+may employ late locking or other protections from OS access. 
+
+###  TpmEventLogAudit
+Audit tool to collect the TPM Event Log from the system in standard format.  It can
+then be programatically compared against a known event log for the given system.  Easy
+this that can be tested are the number of events in some PCRs, confirm that all PCRs
+should be capped, etc.  
 

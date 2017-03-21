@@ -2,7 +2,7 @@
 # Uefi Shell based Application that Unit Tests the XmlTreeLib
 # this includes parsing Xml, printing Xml, escaping and removing escape sequences for xml strings.  
 #
-# Copyright (c) 2016, Microsoft Corporation
+# Copyright (c) 2017, Microsoft Corporation
 
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without 
@@ -58,6 +58,7 @@
   XmlTreeLib
   UnitTestLib
   UnitTestAssertLib
+  PrintLib
 
 [Protocols]
   

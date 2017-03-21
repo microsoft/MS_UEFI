@@ -1,7 +1,7 @@
 /** @file -- SampleUnitTestApp.c
 This is a sample EFI Shell application to demostrate the usage of the Unit Test Library.
 
-Copyright (c) 2016, Microsoft Corporation
+Copyright (c) 2017, Microsoft Corporation
 
 All rights reserved.
 Redistribution and use in source and binary forms, with or without 
@@ -27,6 +27,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Uefi.h>
 #include <Library/UefiLib.h>
+#include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
 #include <UnitTestTypes.h>
 #include <Library/UnitTestLib.h>
@@ -34,7 +35,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #define UNIT_TEST_APP_NAME        L"Sample Unit Test Library Application"
-#define UNIT_TEST_APP_SHORT_NAME  L"Sample_Unit_Test_Lib_App"
 #define UNIT_TEST_APP_VERSION     L"0.1"
 
 
@@ -165,13 +165,16 @@ SampleUnitTestApp (
   EFI_STATUS                Status;
   UNIT_TEST_FRAMEWORK       *Fw = NULL;
   UNIT_TEST_SUITE           *SimpleMathTests, *GlobalVarTests;
+  CHAR16  ShortName[100];
+  ShortName[0] = L'\0';
 
+  UnicodeSPrint(&ShortName[0], sizeof(ShortName), L"%a", gEfiCallerBaseName); 
   DEBUG(( DEBUG_INFO, "%s v%s\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION ));
 
   //
   // Start setting up the test framework for running the tests.
   //
-  Status = InitUnitTestFramework( &Fw, UNIT_TEST_APP_NAME, UNIT_TEST_APP_SHORT_NAME, UNIT_TEST_APP_VERSION );
+  Status = InitUnitTestFramework( &Fw, UNIT_TEST_APP_NAME, ShortName, UNIT_TEST_APP_VERSION );
   if (EFI_ERROR( Status ))
   {
     DEBUG((DEBUG_ERROR, "Failed in InitUnitTestFramework. Status = %r\n", Status));
