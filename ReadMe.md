@@ -64,7 +64,8 @@ package is to create easy to use and easy to automate tools that can be run as p
     # Audit Test apps                                  #
     ####################################################
 
-    UefiTestingPkg/AuditTests/UefiVarLockAudit/UEFI/UefiVarLockAudit.inf
+    UefiTestingPkg/AuditTests/UefiVarLockAudit/UEFI/UefiVarLockAuditTestApp.inf
+    UefiTestingPkg/AuditTests/TpmEventLogAudit/TpmEventLogAuditTestApp.inf
 
 
     ####################################################
