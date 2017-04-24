@@ -3,6 +3,7 @@
 #  to show progress bar and logo.
 #  
 #  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016, Microsoft Corporation<BR>
 #  This program and the accompanying materials are licensed and made available under
 #  the terms and conditions of the BSD License that accompanies this distribution.
 #  The full text of the license may be found at
@@ -51,6 +52,7 @@
   gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES  
   gEfiUserManagerProtocolGuid                   ## CONSUMES
   gEdkiiPlatformLogoProtocolGuid                ## CONSUMES
+  gEfiBootLogoProtocol2Guid                     ## SOMETIMES_CONSUMES  (MS_CHANGE)
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## CONSUMES

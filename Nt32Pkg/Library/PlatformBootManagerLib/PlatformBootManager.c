@@ -4,6 +4,7 @@
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) 2016, Microsoft Corporation<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -333,6 +334,12 @@ PlatformBootManagerAfterConsole (
   EFI_INPUT_KEY                  F7;
   EFI_BOOT_MANAGER_LOAD_OPTION   BootOption;
   UINTN                          OptionNumber;
+
+  // MS_CHANGE: Start
+  if (PcdGetBool(PcdTestKeyUsed) == TRUE) {
+    Print(L"WARNING: Capsule Test Key is used.\n");
+  }
+  // MS_CHANGE: End
 
   Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
   White.Blue = White.Green = White.Red = White.Reserved = 0xFF;

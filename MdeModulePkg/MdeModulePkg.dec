@@ -7,7 +7,7 @@
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-#
+# Copyright (c) 2016, Microsoft Corporation<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -166,6 +166,11 @@
   ## @libraryclass   Provides a service to register non-discoverable device
   ##
   NonDiscoverableDeviceRegistrationLib|Include/Library/NonDiscoverableDeviceRegistrationLib.h
+
+  ## MS_CHANGE: BMP support for capsule processing
+  ## @libraryclass  Provides BMP support.
+  #
+  BmpSupportLib|Include/Library/BmpSupportLib.h
 
 [Guids]
   ## MdeModule package token space guid
@@ -507,6 +512,9 @@
 
   ## Include/Protocol/BootLogo.h
   gEfiBootLogoProtocolGuid = { 0xcdea2bd3, 0xfc25, 0x4c1c, { 0xb9, 0x7c, 0xb3, 0x11, 0x86, 0x6, 0x49, 0x90 } }
+  
+  # MS_CHANGE: Include/Protocol/BootLogo2.h
+  gEfiBootLogoProtocol2Guid = { 0x4b5dc1df, 0x1eaa, 0x48b2, { 0xa7, 0xe9, 0xea, 0xc4, 0x89, 0xa0, 0xb, 0x5c } }
 
   ## Include/Protocol/DisplayProtocol.h
   gEdkiiFormDisplayEngineProtocolGuid = { 0x9bbe29e9, 0xfda1, 0x41ec, { 0xad, 0x52, 0x45, 0x22, 0x13, 0x74, 0x2d, 0x2e } }

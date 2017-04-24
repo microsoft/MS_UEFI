@@ -3,6 +3,7 @@
   to show progress bar and LOGO.
 
 Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -26,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
+#include <Protocol/BootLogo2.h>  // MS_CHANGE
 
 /**
   Show LOGO returned from Edkii Platform Logo protocol on all consoles.
@@ -56,6 +58,7 @@ BootLogoEnableLogo (
   UINT32                                RefreshRate;
   EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
   EFI_BOOT_LOGO_PROTOCOL                *BootLogo;
+  EFI_BOOT_LOGO_PROTOCOL2               *BootLogo2;     // MS_CHANGE
   UINTN                                 NumberOfLogos;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL         *LogoBlt;
   UINTN                                 LogoDestX;
@@ -76,6 +79,17 @@ BootLogoEnableLogo (
   // Try to open GOP first
   //
   Status = gBS->HandleProtocol (gST->ConsoleOutHandle, &gEfiGraphicsOutputProtocolGuid, (VOID **) &GraphicsOutput);
+
+  //
+  // MS_CHANGE: START
+  // This block of code is to workaround a known bug where GOP is sometimes not found
+  // on gST->ConsoleOutHandle handle
+  //
+  if (EFI_ERROR (Status)) {
+    Status = gBS->LocateProtocol(&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&GraphicsOutput);
+  }
+  // END
+
   if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
     GraphicsOutput = NULL;
     //
@@ -97,6 +111,12 @@ BootLogoEnableLogo (
   if (EFI_ERROR (Status)) {
     BootLogo = NULL;
   }
+
+  //
+  // // MS_CHANGE: Try to open Boot Logo 2 Protocol.
+  //
+  BootLogo2 = NULL;
+  gBS->LocateProtocol (&gEfiBootLogoProtocol2Guid, NULL, (VOID **) &BootLogo2);
 
   //
   // Erase Cursor from screen
@@ -331,6 +351,12 @@ BootLogoEnableLogo (
 
   if (!EFI_ERROR (Status)) {
     BootLogo->SetBootLogo (BootLogo, LogoBlt, LogoDestX, LogoDestY, LogoWidth, LogoHeight);
+
+    // MS_CHANGE: Start
+    if (BootLogo2 != NULL) {
+      BootLogo2->SetBootLogo (BootLogo2, LogoBlt, LogoDestX, LogoDestY, LogoWidth, LogoHeight);
+    }
+    // MS_CHANGE: End
   }
   FreePool (LogoBlt);
 
