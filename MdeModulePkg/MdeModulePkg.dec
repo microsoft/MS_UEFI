@@ -166,6 +166,10 @@
   ## @libraryclass   Provides a service to register non-discoverable device
   ##
   NonDiscoverableDeviceRegistrationLib|Include/Library/NonDiscoverableDeviceRegistrationLib.h
+  
+  ## @libraryclass   Provides helper functions to prevent integer overflow during
+  #  type conversion, addition, subtraction, and multiplication.
+  IntSafeLib|Include/Library/IntSafeLib.h
 
 [Guids]
   ## MdeModule package token space guid
