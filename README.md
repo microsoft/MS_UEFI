@@ -51,3 +51,9 @@ integer operations overflowed, not if you are doing the right thing
 with your non-overflowed integers.
 
 Likewise you can overflow a buffer with a non-overflowed unsigned index.
+
+**Unit Tests**
+
+Unit tests used for testing of all of the functions of this library are at
+UnitTests/IntSafeLib, but they are not compiled due to dependencies on
+UnitTestLib and UnitTestAssertLib.
