@@ -1574,6 +1574,12 @@ PciIoAttributes (
     }
   }
 
+  // RootBridgeIo doesn't support BUS_MASTER as an option. Remove BUS_MASTER   
+  // from attributes going up to the HostBridge.                               
+  if (PciIoDevice->Parent == NULL) {                                           
+    Attributes &= ~EFI_PCI_IO_ATTRIBUTE_BUS_MASTER;                            
+  }                                                                            
+
   //
   // If no attributes can be supported, then return.
   // Otherwise, set the attributes that it can support.
@@ -1687,12 +1693,11 @@ PciIoAttributes (
   }
   //
   // The upstream bridge should be also set to revelant attribute
-  // expect for IO, Mem and BusMaster
+  // expect for IO and Mem
   //
   UpStreamAttributes = Attributes &
                        (~(EFI_PCI_IO_ATTRIBUTE_IO     |
-                          EFI_PCI_IO_ATTRIBUTE_MEMORY |
-                          EFI_PCI_IO_ATTRIBUTE_BUS_MASTER
+                          EFI_PCI_IO_ATTRIBUTE_MEMORY
                           )
                         );
   UpStreamBridge = PciIoDevice->Parent;

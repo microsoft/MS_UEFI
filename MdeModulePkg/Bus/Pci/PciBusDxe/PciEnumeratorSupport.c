@@ -1196,6 +1196,7 @@ DetermineDeviceAttribute (
   )
 {
   UINT16          Command;
+  UINT16          BridgeSupportsMaster;
   UINT16          BridgeControl;
   UINT16          OldCommand;
   UINT16          OldBridgeControl;
@@ -1218,10 +1219,11 @@ DetermineDeviceAttribute (
       return Status;
     }
     //
-    // Assume the PCI Root Bridge supports DAC
+    // Assume the PCI Root Bridge supports DAC and BUS_MASTER             
     //
     PciIoDevice->Supports |= (UINT64)(EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
                               EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM |
+                              EFI_PCI_IO_ATTRIBUTE_BUS_MASTER   |
                               EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
 
   } else {
@@ -1236,6 +1238,22 @@ DetermineDeviceAttribute (
               EFI_PCI_COMMAND_BUS_MASTER   |
               EFI_PCI_COMMAND_VGA_PALETTE_SNOOP;
 
+    // This ASSUMES all P2P bridges are Bus Master capable
+    BridgeSupportsMaster = 0;
+
+    if (IS_PCI_BRIDGE(&PciIoDevice->Pci)) {
+      Command &= ~EFI_PCI_COMMAND_BUS_MASTER;
+      BridgeSupportsMaster |= EFI_PCI_COMMAND_BUS_MASTER;
+      DEBUG((EFI_D_INFO,"P2P PciIo=%p, Parent=%p, Command set to %x. Bus=%d,Dev=%d,Fun=%d\n",
+                         &PciIoDevice->PciIo,
+                         &PciIoDevice->Parent,
+                         Command,
+                         PciIoDevice->BusNumber,
+                         PciIoDevice->DeviceNumber,
+                         PciIoDevice->FunctionNumber
+                         ));
+    }
+
     BridgeControl = EFI_PCI_BRIDGE_CONTROL_ISA | EFI_PCI_BRIDGE_CONTROL_VGA | EFI_PCI_BRIDGE_CONTROL_VGA_16;
 
     //
@@ -1246,7 +1264,7 @@ DetermineDeviceAttribute (
     //
     // Set the supported attributes for specified PCI device
     //
-    PciSetDeviceAttribute (PciIoDevice, Command, BridgeControl, EFI_SET_SUPPORTS);
+    PciSetDeviceAttribute (PciIoDevice, (Command|BridgeSupportsMaster), BridgeControl, EFI_SET_SUPPORTS);
 
     //
     // Set the current attributes for specified PCI device

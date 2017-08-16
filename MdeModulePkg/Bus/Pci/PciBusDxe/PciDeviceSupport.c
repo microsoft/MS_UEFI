@@ -711,7 +711,7 @@ StartPciDevicesOnBridge (
                              0,
                              &Supports
                              );
-        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+        Supports &= (UINT64) (EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),
                              EfiPciIoAttributeOperationEnable,
@@ -763,7 +763,7 @@ StartPciDevicesOnBridge (
                              0,
                              &Supports
                              );
-        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+        Supports &= (UINT64) (EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),
                              EfiPciIoAttributeOperationEnable,
