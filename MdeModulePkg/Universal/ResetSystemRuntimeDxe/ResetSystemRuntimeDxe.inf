@@ -57,7 +57,8 @@
 [Protocols]
   gEfiResetArchProtocolGuid                     ## PRODUCES
   gEfiResetNotificationProtocolGuid             ## PRODUCES
-
+  gEdkiiPlatformSpecificResetFilterProtocolGuid   ## PRODUCES
+  gEdkiiPlatformSpecificResetHandlerProtocolGuid  ## PRODUCES
 
 [Depex]
   TRUE
