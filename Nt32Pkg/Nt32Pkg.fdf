@@ -189,6 +189,7 @@ INF  Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
 
 INF  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
 INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+INF  MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
 
 INF  Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf

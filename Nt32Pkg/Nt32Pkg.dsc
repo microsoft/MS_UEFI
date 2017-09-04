@@ -214,6 +214,9 @@
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   OemHookStatusCodeLib|Nt32Pkg/Library/PeiNt32OemHookStatusCodeLib/PeiNt32OemHookStatusCodeLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+  WinNtLib|Nt32Pkg/Library/PeiWinNtLib/PeiWinNtLib.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/PeiResetHelperLib.inf
+
 
 [LibraryClasses.common]
   #
@@ -230,6 +233,7 @@
   WinNtLib|Nt32Pkg/Library/DxeWinNtLib/DxeWinNtLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+  ResetHelperLib|MdeModulePkg/Library/ResetHelperLib/DxeResetHelperLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -371,11 +375,17 @@
   
   MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
 
   Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
   Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
   Nt32Pkg/WinNtThunkPPIToProtocolPei/WinNtThunkPPIToProtocolPei.inf
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+      NULL|Nt32Pkg/Library/ResetFiltersAndHandlersTest/ResetFiltersAndHandlersTestPei.inf
+      ResetSystemLib|MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
+  }
+
   ##
   #  DXE Phase modules
   ##
@@ -496,7 +506,12 @@
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
 !endif
 
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
+    <LibraryClasses>
+      NULL|Nt32Pkg/Library/ResetFiltersAndHandlersTest/ResetFiltersAndHandlersTestDxe.inf
+      ResetSystemLib|MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
+  }
+
   MdeModulePkg/Application/UiApp/UiApp.inf{
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
