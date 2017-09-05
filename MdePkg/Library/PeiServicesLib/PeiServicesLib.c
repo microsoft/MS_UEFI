@@ -779,7 +779,7 @@ PeiServicesInstallFvInfo2Ppi (
                             where a minimum amount of ResetData is always required.
 
 **/
-EFI_STATUS
+VOID
 EFIAPI
 PeiServicesResetSystem2 (
   IN EFI_RESET_TYPE     ResetType,
