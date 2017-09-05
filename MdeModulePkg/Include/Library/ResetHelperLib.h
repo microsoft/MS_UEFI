@@ -75,7 +75,7 @@ ResetSystemWithSubtype (
 **/
 EFI_GUID *
 EFIAPI
-GetResetSystemSubtypeGuid (
+GetResetSubtypeGuid (
   IN UINTN       DataSize,
   IN CONST VOID  *ResetData
   );
