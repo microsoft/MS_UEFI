@@ -15,6 +15,9 @@
 
 #include "ResetSystem.h"
 
+GLOBAL_REMOVE_IF_UNREFERENCED
+CHAR16 *mResetTypeStr[] = { L"Cold", L"Warm", L"Shutdown", L"PlatformSpecific" };
+
 //
 // The current ResetSystem() notification recursion depth
 //
@@ -252,16 +255,6 @@ ResetSystem (
   RESET_NOTIFY_ENTRY  *Entry;
 
   //
-  // Above the maximum recursion depth, so do the smallest amount of
-  // work to perform a cold reset.
-  //
-  if (mResetNotifyDepth >= MAX_RESET_NOTIFY_DEPTH) {
-    ResetCold ();
-    ASSERT (FALSE);
-    return;
-  }
-
-  //
   // Only do REPORT_STATUS_CODE() on first call to ResetSystem()
   //
   if (mResetNotifyDepth == 0) {
@@ -272,7 +265,9 @@ ResetSystem (
   }
 
   mResetNotifyDepth++;
-  if (!EfiAtRuntime () && mResetNotifyDepth < MAX_RESET_NOTIFY_DEPTH) {
+  DEBUG ((DEBUG_INFO, "PEI ResetSystem2: Reset call depth = %d.\n", mResetNotifyDepth));
+
+  if (!EfiAtRuntime () && mResetNotifyDepth <= MAX_RESET_NOTIFY_DEPTH) {
     //
     // Call reset notification functions registered through the
     // EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL.
@@ -306,6 +301,9 @@ ResetSystem (
       Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
       Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
     }
+  } else {
+    ASSERT (ResetType < ARRAY_SIZE (mResetTypeStr));
+    DEBUG ((DEBUG_ERROR, "DXE ResetSystem2: Maximum reset call depth is met. Use the current reset type: %s!\n", mResetTypeStr[ResetType]));
   }
 
   switch (ResetType) {
@@ -331,7 +329,6 @@ ResetSystem (
     }
 
     ResetWarm ();
-
     break;
 
  case EfiResetCold:
