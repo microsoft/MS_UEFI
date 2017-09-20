@@ -166,14 +166,6 @@ if not defined WORKSPACE (
    goto skip_reconfig
 )
 
-IF NOT exist "%EDK_TOOLS_PATH%\set_vsprefix_envs.bat" (
-  @echo.
-  @echo !!! ERROR !!! The set_vsprefix_envs.bat was not found !!!
-  @echo.
-  goto end
-)
-call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat
-
 if not defined CONF_PATH (
   set CONF_PATH=%WORKSPACE%\Conf
 )
@@ -200,6 +192,27 @@ if NOT exist %CONF_PATH% (
     echo.
   )
 )
+
+if NOT exist %CONF_PATH%\set_vsprefix_envs.bat (
+  echo copying ... set_vsprefix_envs.bat to %CONF_PATH%\set_vsprefix_envs.bat
+  if NOT exist %EDK_TOOLS_PATH%\set_vsprefix_envs.bat (
+    echo Error: set_vsprefix_envs.bat is missing at folder %EDK_TOOLS_PATH%\Conf\
+  )
+  copy %EDK_TOOLS_PATH%\set_vsprefix_envs.bat %CONF_PATH%\set_vsprefix_envs.bat > nul
+) else (
+  if defined RECONFIG echo over-write ... set_vsprefix_envs.bat to %CONF_PATH%\set_vsprefix_envs.bat
+  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\set_vsprefix_envs.bat %CONF_PATH%\set_vsprefix_envs.bat > nul
+)
+
+IF NOT exist "%CONF_PATH%\set_vsprefix_envs.bat" (
+  @echo.
+  @echo !!! ERROR !!! The set_vsprefix_envs.bat was not found !!!
+  @echo.
+  goto end
+)
+@echo calling set_vsprefix_envs 
+
+call %CONF_PATH%\set_vsprefix_envs.bat
 
 if NOT exist %CONF_PATH%\target.txt (
   echo copying ... target.template to %CONF_PATH%\target.txt
@@ -232,6 +245,18 @@ if NOT exist %CONF_PATH%\build_rule.txt (
 ) else (
   if defined RECONFIG echo over-write ... build_rule.template to %CONF_PATH%\build_rule.txt
   if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\build_rule.template %CONF_PATH%\build_rule.txt > nul
+)
+
+if NOT exist %CONF_PATH%\codesigning.pfx (
+  echo copying ... insecure test cert to %CONF_PATH%\codesigning.pfx
+  if NOT exist %EDK_TOOLS_PATH%\Conf\InsecureBoot_password_is_pw_Codesigning.pfx (
+    echo Warning: codesigning placeholder is missing at folder %EDK_TOOLS_PATH%\Conf\
+	echo if secure boot driver signing support for msft tool chain is desired you should manually place appropriate codesigning.pfx file in Conf directory
+  )
+  copy %EDK_TOOLS_PATH%\Conf\InsecureBoot_password_is_pw_Codesigning.pfx %CONF_PATH%\codesigning.pfx > nul
+) else (
+  if defined RECONFIG echo RECONFIG won't overwrite codesigning cert because it may be a real cert from an external process that is difficult to recreate
+  if defined RECONFIG echo RECONFIG if you really want to force reconfig of the cert then manually delete %conf_path%\codesigning.pfx and redo the RECONFIG
 )
 
 echo           PATH      = %PATH%

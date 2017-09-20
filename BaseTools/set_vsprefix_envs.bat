@@ -18,6 +18,8 @@
 @echo off
 pushd .
 
+@echo set_vs_prefix_envs
+
 if defined VS71COMNTOOLS (
   if not defined VS2003_PREFIX (
     set "VS2003_PREFIX=%VS71COMNTOOLS:~0,-14%"
@@ -89,6 +91,14 @@ if defined VS140COMNTOOLS (
     set "WINSDK81x86_PREFIX=c:\Program Files (x86)\Windows Kits\8.1\bin\"
   )
 )
+
+:: vs2017
+if not defined VS150INSTALLPATH (
+	set "VS150INSTALLPATH=c:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise"
+)	
+if not defined VS150TOOLVER (
+	set VS150TOOLVER=14.11.25503
+)	
 
 if not defined WINDDK3790_PREFIX (
   set WINDDK3790_PREFIX=C:\WINDDK\3790.1830\bin\
