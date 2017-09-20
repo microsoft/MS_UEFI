@@ -15,8 +15,9 @@
 
 #include "ResetSystem.h"
 
-GLOBAL_REMOVE_IF_UNREFERENCED
-CHAR16 *mResetTypeStr[] = { L"Cold", L"Warm", L"Shutdown", L"PlatformSpecific" };
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mResetTypeStr[] = {
+  L"Cold", L"Warm", L"Shutdown", L"PlatformSpecific"
+};
 
 EFI_PEI_RESET2_PPI mPpiReset2 = {
   ResetSystem2
@@ -235,7 +236,6 @@ InitializeResetSystem (
   VOID        *Ppi;
 
   Status = PeiServicesLocatePpi (&gEfiPeiReset2PpiGuid, 0, NULL, (VOID **)&Ppi);
-  ASSERT (Status == EFI_NOT_FOUND);
   if (Status != EFI_NOT_FOUND) {
     return EFI_ALREADY_STARTED;
   }
