@@ -7626,3 +7626,14 @@ RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_F
 # Build rule order
 #################
 *_*_*_*_BUILDRULEORDER = nasm asm Asm ASM S s
+
+
+##################
+# signtool definitions
+##################
+DEFINE CONF_PATH			   = ENV(WORKSPACE)\conf
+DEFINE SIGNTOOL_CERT_PATH      = DEF(CONF_PATH)
+DEFINE SIGNTOOL_PFX_PASSWORD   = ENV(SIGNTOOL_PFX_PASSWORD)
+*_*_*_SIGNTOOL_PATH            = DEF(WINSDK81x86_BIN)\signtool.exe
+*_*_*_SIGNTOOL_FLAGS           = sign /f DEF(SIGNTOOL_CERT_PATH)\CodeSigning.pfx /p DEF(SIGNTOOL_PFX_PASSWORD)
+

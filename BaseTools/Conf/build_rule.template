@@ -362,12 +362,13 @@
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).efi
 
-    <Command.MSFT, Command.INTEL, Command.RVCT>
+    <Command.INTEL, Command.RVCT>
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
+
     <Command.GCC, Command.GCCLD>
         $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
         $(OBJCOPY) --strip-unneeded -R .eh_frame ${src}
@@ -382,7 +383,15 @@
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-        
+		
+    <Command.MSFT>
+        "$(GENFW)" -e $(MODULE_TYPE) -o $(DEBUG_DIR)(+)$(MODULE_NAME).efi ${src} $(GENFW_FLAGS)
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
+        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).efi $(OUTPUT_DIR)
+        "$(SIGNTOOL)" $(SIGNTOOL_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME).efi
+        -$(CP) $(OUTPUT_DIR)(+)$(MODULE_NAME).efi $(BIN_DIR)
+
     <Command.XCODE>
         # tool to convert Mach-O to PE/COFF
         "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS)  ${src}  $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff
