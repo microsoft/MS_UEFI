@@ -1,0 +1,83 @@
+## @file
+# This is a sample HII driver. 
+#
+# This driver shows how HII protocol, VFR and UNI files are used to create a HII 
+# driver which can be dipslayed and configured by a UEFI HII Form Browser.
+#
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+# Copyright (c) 2017 Microsoft
+#
+# boot logo override sample package -- boot logo override sample
+#
+# adapted from tianocore mdemodulepkg\universal\DriverSampleDxe
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootLogoOverride
+  MODULE_UNI_FILE                = BootLogoOverride.uni
+  FILE_GUID                      = 536DBA3A-AAC1-4825-8A1D-076608E308C8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BootLogoOverrideInit
+  UNLOAD_IMAGE                   = BootLogoOverrideUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  BootLogoOverride.c
+  BootLogoOverride.h
+  contoso_bmp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  BaseLib   
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  UefiLib
+  ImageDecoderLib
+  BmpImageDecoderLib
+
+#  gEfiEventReadyToBootGuid
+
+[Guids]
+  gEfiEventDxeDispatchGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventReadyToBootGuid
+
+[Protocols]
+  gEfiSimpleTextOutProtocolGuid                 ## CONSUMES (debug only)
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiUgaDrawProtocolGuid                       ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## CONSUMES
+
+[depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BootLogoOverrideExtra.uni

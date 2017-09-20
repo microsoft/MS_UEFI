@@ -1,0 +1,20 @@
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = IoTSamples
+  PACKAGE_GUID                   = F4F98677-18C8-4E74-BEE6-BB6A4E657291
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+
+[Guids.common]
+  gMsPublicIoTSamplesTokenSpaceGuid =  { 0xf4f98677, 0x18c8, 0x4e74, { 0xbe, 0xe6, 0xbb, 0x6a, 0x4e, 0x65, 0x72, 0x91 } }
+

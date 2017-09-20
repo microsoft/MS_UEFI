@@ -1,0 +1,69 @@
+## @file
+#
+# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+# Copyright (c) 2017 Microsoft
+#
+# boot logo override sample package -- 'hello world' skeleton driver to validate load/unload from efi shell is working
+#
+# adapted from tianocore mdemodulepkg\universal\DriverSampleDxe
+#
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = NullHello
+  MODULE_UNI_FILE                = NullHello.uni
+  FILE_GUID                      = F4D405BD-7773-47C7-A341-30E68825C89C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NullHelloInit
+  UNLOAD_IMAGE                   = NullHelloUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  NullHello.c
+  NullHello.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  UefiLib
+
+[Guids]
+
+[Protocols]
+  gEfiSimpleTextOutProtocolGuid
+
+[depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  NullHelloExtra.uni

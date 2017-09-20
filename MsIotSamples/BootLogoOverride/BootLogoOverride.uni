@@ -1,0 +1,26 @@
+// /** @file
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution. The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+// 
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// **/
+
+// Copyright (c) 2017 Microsoft
+//
+// boot logo override sample package -- boot logo override sample
+//
+// adapted from tianocore mdemodulepkg\universal\DriverSampleDxe
+//
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Sample DXE driver to override the boot logo"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver shows how to override the boot logo."
+
