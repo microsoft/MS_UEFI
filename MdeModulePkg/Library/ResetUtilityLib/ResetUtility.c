@@ -1,5 +1,5 @@
-/** @file -- ResetHelperLibCommon.c
-This contains the business logic for the module-specific Reset Helper functions.
+/** @file -- ResetUtility.c
+This contains the business logic for the Reset Utility functions.
 
 Copyright (c) 2016, Microsoft Corporation
 Copyright (c) 2017, Intel Corporation
@@ -26,8 +26,46 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
 
-#include <Base.h>
-#include "ResetHelperLibCommon.h"
+#include <Uefi.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/ResetSystemLib.h>
+
+typedef struct {
+  CHAR16 NullTerminator;
+  GUID   ResetSubtype;
+} RESET_UTILITY_GUID_SPECIFIC_RESET_DATA;
+
+/**
+  This is a shorthand helper function to reset with a subtype so that
+  the caller doesn't have to bother with a function that has half a dozen
+  parameters.
+
+  This will generate a reset with status EFI_SUCCESS, a NULL string, and
+  no custom data. The subtype will be formatted in such a way that it can be
+  picked up by notification registrations and custom handlers.
+
+  NOTE: This call will fail if the architectural ResetSystem underpinnings
+        are not initialized. For DXE, you can add gEfiResetArchProtocolGuid
+        to your DEPEX.
+
+  @param[in]  ResetType     Base reset type as defined in UEFI spec.
+  @param[in]  ResetSubtype  GUID pointer for the reset subtype to be used.
+
+**/
+VOID
+EFIAPI
+ResetPlatformSpecificGuid (
+  IN CONST  GUID        *ResetSubtype
+  )
+{
+  RESET_UTILITY_GUID_SPECIFIC_RESET_DATA  ResetData;
+
+  ResetData.NullTerminator = CHAR_NULL;
+  CopyGuid (&ResetData.ResetSubtype, ResetSubtype);
+  ResetPlatformSpecific (sizeof (ResetData), &ResetData);
+}
 
 /**
   This function examines the DataSize and ResetData parameters passed to
@@ -38,29 +76,29 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @param[in]  DataSize    The size, in bytes, of ResetData.
   @param[in]  ResetData   Pointer to the data buffer passed into ResetSystem().
 
-  @retval     Pointer     Pointer to the EFI_GUID value in ResetData.
+  @retval     Pointer     Pointer to the GUID value in ResetData.
   @retval     NULL        ResetData is NULL.
   @retval     NULL        ResetData does not start with a Null-terminated
                           Unicode string.
   @retval     NULL        A Null-terminated Unicode string is present, but there
-                          are less than sizeof(EFI_GUID) bytes after the string.
+                          are less than sizeof (GUID) bytes after the string.
   @retval     NULL        No subtype is found.
 
 **/
-EFI_GUID*
+GUID *
 EFIAPI
-GetResetSubtypeGuid (
+GetResetPlatformSpecificGuid (
   IN UINTN       DataSize,
   IN CONST VOID  *ResetData
   )
 {
-  UINTN     ResetDataStringSize;
-  EFI_GUID  *ResetSubtypeGuid;
+  UINTN          ResetDataStringSize;
+  GUID           *ResetSubtypeGuid;
 
   //
   // Make sure parameters are valid
   //
-  if (ResetData == NULL || DataSize < sizeof (EFI_GUID)) {
+  if (ResetData == NULL || DataSize < sizeof (GUID)) {
     return NULL;
   }
 
@@ -75,8 +113,8 @@ GetResetSubtypeGuid (
   // GUID should be immediately after the string itself.
   //
   if (ResetDataStringSize < DataSize &&
-      (DataSize - ResetDataStringSize) >= sizeof (EFI_GUID)) {
-    ResetSubtypeGuid = (EFI_GUID *)((UINT8 *)ResetData + ResetDataStringSize);
+      (DataSize - ResetDataStringSize) >= sizeof (GUID)) {
+    ResetSubtypeGuid = (GUID *)((UINT8 *)ResetData + ResetDataStringSize);
     DEBUG ((DEBUG_VERBOSE, __FUNCTION__" - Detected reset subtype %g...\n", ResetSubtypeGuid));
     return ResetSubtypeGuid;
   }
@@ -106,22 +144,22 @@ GetResetSubtypeGuid (
   @param[in]      ExtraData      Pointer to a buffer of extra data.  This
                                  parameter is optional and may be NULL.
 
-  @retval     EFI_SUCCESS             ResetDataSize and ResetData are updated.
-  @retval     EFI_INVALID_PARAMETER   ResetDataSize is NULL.
-  @retval     EFI_INVALID_PARAMETER   ResetData is NULL.
-  @retval     EFI_INVALID_PARAMETER   ExtraData was provided without a
-                                      ResetSubtype. This is not supported by the
-                                      UEFI spec.
-  @retval     EFI_BUFFER_TOO_SMALL    An insufficient buffer was provided.
-                                      ResetDataSize is updated with minimum size
-                                      required.
+  @retval     RETURN_SUCCESS             ResetDataSize and ResetData are updated.
+  @retval     RETURN_INVALID_PARAMETER   ResetDataSize is NULL.
+  @retval     RETURN_INVALID_PARAMETER   ResetData is NULL.
+  @retval     RETURN_INVALID_PARAMETER   ExtraData was provided without a
+                                         ResetSubtype. This is not supported by the
+                                         UEFI spec.
+  @retval     RETURN_BUFFER_TOO_SMALL    An insufficient buffer was provided.
+                                         ResetDataSize is updated with minimum size
+                                         required.
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
-ConstructResetData (
+BuildResetData (
   IN OUT   UINTN     *ResetDataSize,
   IN OUT   VOID      *ResetData,
-  IN CONST EFI_GUID  *ResetSubtype  OPTIONAL,
+  IN CONST GUID      *ResetSubtype  OPTIONAL,
   IN CONST CHAR16    *ResetString   OPTIONAL,
   IN       UINTN     ExtraDataSize  OPTIONAL,
   IN CONST VOID      *ExtraData     OPTIONAL
@@ -135,19 +173,19 @@ ConstructResetData (
   // If the size return pointer is NULL.
   //
   if (ResetDataSize == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
   //
   // If extra data is indicated, but pointer is NULL.
   //
   if (ExtraDataSize > 0 && ExtraData == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
   //
   // If extra data is indicated, but no subtype GUID is supplied.
   //
   if (ResetSubtype == NULL && ExtraDataSize > 0) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
 
   //
@@ -163,7 +201,7 @@ ConstructResetData (
   ResetStringSize     = StrnSizeS (ResetString, MAX_UINT16);
   ResetDataBufferSize = ResetStringSize + ExtraDataSize;
   if (ResetSubtype != NULL) {
-    ResetDataBufferSize += sizeof(EFI_GUID);
+    ResetDataBufferSize += sizeof (GUID);
   }
 
   //
@@ -172,11 +210,11 @@ ConstructResetData (
   //
   if (*ResetDataSize < ResetDataBufferSize) {
     *ResetDataSize = ResetDataBufferSize;
-    return EFI_BUFFER_TOO_SMALL;
+    return RETURN_BUFFER_TOO_SMALL;
   }
   *ResetDataSize = ResetDataBufferSize;
   if (ResetData == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
 
   //
@@ -186,12 +224,12 @@ ConstructResetData (
   CopyMem (Data, ResetString, ResetStringSize);
   Data += ResetStringSize;
   if (ResetSubtype != NULL) {
-    CopyMem (Data, ResetSubtype, sizeof(EFI_GUID));
-    Data += sizeof( EFI_GUID );
+    CopyMem (Data, ResetSubtype, sizeof (GUID));
+    Data += sizeof (GUID);
   }
   if (ExtraDataSize > 0) {
     CopyMem (Data, ExtraData, ExtraDataSize);
   }
   
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }

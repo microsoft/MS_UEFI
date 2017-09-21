@@ -294,8 +294,7 @@
   MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
-  MdeModulePkg/Library/ResetHelperLib/DxeResetHelperLib.inf
-  MdeModulePkg/Library/ResetHelperLib/PeiResetHelperLib.inf
+  MdeModulePkg/Library/ResetUtilityLib/ResetUtilityLib.inf
   MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
   MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf

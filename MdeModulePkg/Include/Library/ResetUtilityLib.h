@@ -1,4 +1,4 @@
-/** @file -- ResetHelperLib.h
+/** @file -- ResetUtilityLib.h
 This header describes various helper functions for resetting the system.
 
 Copyright (c) 2016, Microsoft Corporation
@@ -26,15 +26,17 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
 
-#ifndef _RESET_HELPER_LIB_H_
-#define _RESET_HELPER_LIB_H_
+#ifndef _RESET_UTILITY_LIB_H_
+#define _RESET_UTILITY_LIB_H_
 
 /**
-  This is a shorthand helper function to reset with a GUID specific subtype.
+  This is a shorthand helper function to reset with a subtype so that
+  the caller doesn't have to bother with a function that has half a dozen
+  parameters.
 
-  The ResetSystem() service is called with a status of EFI_SUCCESS, an empty
-  Null-terminated Unicode string string followed by the GUID value for the 
-  GUID specific subtype.
+  This will generate a reset with status EFI_SUCCESS, a NULL string, and
+  no custom data. The subtype will be formatted in such a way that it can be
+  picked up by notification registrations and custom handlers.
 
   NOTE: This call will fail if the architectural ResetSystem underpinnings
         are not initialized. For DXE, you can add gEfiResetArchProtocolGuid
@@ -43,16 +45,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @param[in]  ResetType     Base reset type as defined in UEFI spec.
   @param[in]  ResetSubtype  GUID pointer for the reset subtype to be used.
 
-  @retval     EFI_INVALID_PARAMETER  ResetSubtype is NULL.
-  @retval     -NONE-                 A successful call does not return.
-                                     The system is reset.
-
 **/
-EFI_STATUS
+VOID
 EFIAPI
-ResetSystemWithSubtype (
-  IN        EFI_RESET_TYPE  ResetType,
-  IN CONST  EFI_GUID        *ResetSubtype
+ResetPlatformSpecificGuid (
+  IN CONST  GUID        *ResetSubtype
   );
 
 /**
@@ -64,18 +61,18 @@ ResetSystemWithSubtype (
   @param[in]  DataSize    The size, in bytes, of ResetData.
   @param[in]  ResetData   Pointer to the data buffer passed into ResetSystem().
 
-  @retval     Pointer     Pointer to the EFI_GUID value in ResetData.
+  @retval     Pointer     Pointer to the GUID value in ResetData.
   @retval     NULL        ResetData is NULL.
   @retval     NULL        ResetData does not start with a Null-terminated
                           Unicode string.
   @retval     NULL        A Null-terminated Unicode string is present, but there
-                          are less than sizeof(EFI_GUID) bytes after the string.
+                          are less than sizeof (GUID) bytes after the string.
   @retval     NULL        No subtype is found.
 
 **/
-EFI_GUID *
+GUID *
 EFIAPI
-GetResetSubtypeGuid (
+GetResetPlatformSpecificGuid (
   IN UINTN       DataSize,
   IN CONST VOID  *ResetData
   );
@@ -103,25 +100,25 @@ GetResetSubtypeGuid (
   @param[in]      ExtraData      Pointer to a buffer of extra data.  This
                                  parameter is optional and may be NULL.
 
-  @retval     EFI_SUCCESS             ResetDataSize and ResetData are updated.
-  @retval     EFI_INVALID_PARAMETER   ResetDataSize is NULL.
-  @retval     EFI_INVALID_PARAMETER   ResetData is NULL.
-  @retval     EFI_INVALID_PARAMETER   ExtraData was provided without a
-                                      ResetSubtype. This is not supported by the
-                                      UEFI spec.
-  @retval     EFI_BUFFER_TOO_SMALL    An insufficient buffer was provided.
-                                      ResetDataSize is updated with minimum size
-                                      required.
+  @retval     RETURN_SUCCESS             ResetDataSize and ResetData are updated.
+  @retval     RETURN_INVALID_PARAMETER   ResetDataSize is NULL.
+  @retval     RETURN_INVALID_PARAMETER   ResetData is NULL.
+  @retval     RETURN_INVALID_PARAMETER   ExtraData was provided without a
+                                         ResetSubtype. This is not supported by the
+                                         UEFI spec.
+  @retval     RETURN_BUFFER_TOO_SMALL    An insufficient buffer was provided.
+                                         ResetDataSize is updated with minimum size
+                                         required.
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
-ConstructResetData (
+BuildResetData (
   IN OUT   UINTN     *ResetDataSize,
   IN OUT   VOID      *ResetData,
-  IN CONST EFI_GUID  *ResetSubtype  OPTIONAL,
+  IN CONST GUID      *ResetSubtype  OPTIONAL,
   IN CONST CHAR16    *ResetString   OPTIONAL,
   IN       UINTN     ExtraDataSize  OPTIONAL,
   IN CONST VOID      *ExtraData     OPTIONAL
   );
 
-#endif // _RESET_HELPER_LIB_H_
+#endif // _RESET_UTILITY_LIB_H_
