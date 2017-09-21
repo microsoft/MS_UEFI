@@ -14,7 +14,7 @@
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
-#include <Library/ResetHelperLib.h>
+#include <Library/ResetUtilityLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ResetSystemLib.h>
 #include <Library/DebugLib.h>

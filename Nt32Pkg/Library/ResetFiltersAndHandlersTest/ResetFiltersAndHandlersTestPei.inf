@@ -39,7 +39,7 @@
   PcdLib
   PeiServicesLib
   ResetSystemLib
-  ResetHelperLib
+  ResetUtilityLib
 
 [Packages]
   MdePkg/MdePkg.dec

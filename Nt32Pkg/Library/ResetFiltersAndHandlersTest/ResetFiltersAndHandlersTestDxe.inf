@@ -38,7 +38,7 @@
   DebugLib
   PcdLib
   ResetSystemLib
-  ResetHelperLib
+  ResetUtilityLib
 
 [Packages]
   MdePkg/MdePkg.dec

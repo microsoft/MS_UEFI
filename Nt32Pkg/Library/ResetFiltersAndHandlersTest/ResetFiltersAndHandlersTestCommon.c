@@ -106,7 +106,7 @@ ChangeResetSubtypeGuid (
   if (ResetType != EfiResetPlatformSpecific) {
     return;
   }
-  Guid = GetResetSubtypeGuid (DataSize, ResetData);
+  Guid = GetResetPlatformSpecificGuid (DataSize, ResetData);
   if (Guid == NULL) {
     return;
   }
@@ -129,11 +129,10 @@ ChangeResetSubtypeGuid (
     Index++;
     UnicodeValueToStringS (MyResetString, sizeof (MyResetString), 0, Index, 0);
     MyResetDataSize = sizeof (MyResetData);
-    ConstructResetData (&MyResetDataSize, MyResetData, &mResetSubtypeGuids[Index], MyResetString, sizeof (EFI_GUID), &mResetSubtypeGuids[Index]);
+    BuildResetData (&MyResetDataSize, MyResetData, &mResetSubtypeGuids[Index], MyResetString, sizeof (EFI_GUID), &mResetSubtypeGuids[Index]);
     ResetPlatformSpecific (MyResetDataSize, MyResetData);
   } else {
     DEBUG ((DEBUG_INFO, "END GUID is met\n"));
-    CpuBreakpoint ();
   }
 }
 
@@ -210,6 +209,6 @@ Test2 (
   // Initiate ResetSystem using GUID #0.
   //
   MyResetDataSize = sizeof (MyResetData);
-  ConstructResetData (&MyResetDataSize, MyResetData, &mResetSubtypeGuids[0], L"0", sizeof (EFI_GUID), &mResetSubtypeGuids[0]);
+  BuildResetData (&MyResetDataSize, MyResetData, &mResetSubtypeGuids[0], L"0", sizeof (EFI_GUID), &mResetSubtypeGuids[0]);
   ResetPlatformSpecific (MyResetDataSize, MyResetData);
 }
