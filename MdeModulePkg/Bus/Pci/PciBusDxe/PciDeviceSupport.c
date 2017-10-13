@@ -20,6 +20,68 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 LIST_ENTRY  mPciDevicePool;
 
+
+/**
+ * DisableBmeOnTree
+ *
+ * @param Bridge
+ *
+ * @return VOID
+ */
+VOID
+DisableBmeOnTree (
+    IN LIST_ENTRY      *Head
+) {
+  LIST_ENTRY      *CurrentLink;
+  PCI_IO_DEVICE   *PciIoDevice;
+  UINT16           Command;
+
+
+  CurrentLink = Head->ForwardLink;
+  while (CurrentLink != NULL && CurrentLink != Head) {
+    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    //
+    // Turn off all children's Bus Master, if any
+    //
+    DisableBmeOnTree(&PciIoDevice->ChildList);
+
+    // If this is a P2P Bridge, disable the Bridge's Bus Master.
+    if (IS_PCI_BRIDGE(&PciIoDevice->Pci)) {
+      PCI_READ_COMMAND_REGISTER(PciIoDevice, &Command);
+      if (EFI_PCI_COMMAND_BUS_MASTER == (Command & EFI_PCI_COMMAND_BUS_MASTER)) {
+        Command &= ~EFI_PCI_COMMAND_BUS_MASTER;
+        PCI_SET_COMMAND_REGISTER (PciIoDevice, Command);
+        DEBUG((EFI_D_INFO,"P2P BME-DISABLED PciIo=%p, Command=%x, Bus=%d,Dev=%d,Fun=%d\n",
+                   &PciIoDevice->PciIo,
+                   Command,
+                   PciIoDevice->BusNumber,
+                   PciIoDevice->DeviceNumber,
+                   PciIoDevice->FunctionNumber));
+      }
+    }
+    CurrentLink = CurrentLink->ForwardLink;
+  }
+}
+
+/**
+ * On ExitBootServices handler.  Inspect all P2P bridges, and
+ * disable Bus Master on any that were enabled during BDS.
+ *
+ * @param Event
+ * @param Context
+ *
+ * @return VOID EFIAPI
+ */
+VOID
+EFIAPI
+OnExitBootServices (
+  IN      EFI_EVENT                 Event,
+  IN      VOID                      *Context
+  ) {
+
+  DisableBmeOnTree(&mPciDevicePool);
+}
+
 /**
   Initialize the PCI devices pool.
 
@@ -29,7 +91,24 @@ InitializePciDevicePool (
   VOID
   )
 {
+  EFI_EVENT   ExitBootServicesEvent;
+  EFI_STATUS  Status;
+
   InitializeListHead (&mPciDevicePool);
+  //
+  // DisableBME on ExitBootServices should be synchonized with VTd disable - with
+  // DisableBME running before VTd disable.  If the VTd disable code runs at TPL_CALLBACK,
+  // then DisableBME will run before VTd disable.
+  //
+  Status = gBS->CreateEventEx( EVT_NOTIFY_SIGNAL,
+                               TPL_NOTIFY,
+                               OnExitBootServices,
+                               NULL,
+                               &gEfiEventExitBootServicesGuid,
+                               &ExitBootServicesEvent );
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_ERROR,"Unable to create ExitBootServices event. COde=%r\n",Status));
+  }
 }
 
 /**
