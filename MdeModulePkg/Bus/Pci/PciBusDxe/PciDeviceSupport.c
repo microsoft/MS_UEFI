@@ -96,9 +96,9 @@ InitializePciDevicePool (
 
   InitializeListHead (&mPciDevicePool);
   //
-  // DisableBME on ExitBootServices should be synchonized with VTd disable - with
-  // DisableBME running before VTd disable.  If the VTd disable code runs at TPL_CALLBACK,
-  // then DisableBME will run before VTd disable.
+  // DisableBME on ExitBootServices should be synchonized with any IOMMU ExitBootServices routine.
+  // DisableBME should be run before the IOMMU protections are disabled.
+  // One way to do this is to ensure that the IOMMU ExitBootServices callback runs at TPL_CALLBACK.
   //
   Status = gBS->CreateEventEx( EVT_NOTIFY_SIGNAL,
                                TPL_NOTIFY,
