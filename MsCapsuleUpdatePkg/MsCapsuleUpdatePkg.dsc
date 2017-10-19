@@ -111,10 +111,11 @@
 ###################################################################################################
 
 [Components]
+  MsCapsuleUpdatePkg\Library\DisplayUpdateProgressTextLib\DisplayUpdateProgressTextLib.inf
   MsCapsuleUpdatePkg\Library\BaseBmpSupportLib\BaseBmpSupportLib.inf
   MsCapsuleUpdatePkg\Library\BaseMsSafeBaseLib\SafeBaseLib.inf
   MsCapsuleUpdatePkg\Library\DxeCapsuleLib\DxeCapsuleLib.inf
-  MsCapsuleUpdatePkg\Library\CapsuleKeyBaseLib\CapsuleKeyBaseLib.inf
+  MsCapsuleUpdatePkg\Library\CapsuleKeyBaseLibNull\CapsuleKeyBaseLibNull.inf
   MsCapsuleUpdatePkg\Library\FmpHelperLib\FmpHelperDxeLib.inf
   MsCapsuleUpdatePkg\Library\CapsuleUpdatePolicyLibNull\CapsuleUpdatePolicyLibNull.inf
   MsCapsuleUpdatePkg\Library\MsFmpPayloadHeaderV1DxeLib\MsFmpPayloadHeaderV1DxeLib.inf

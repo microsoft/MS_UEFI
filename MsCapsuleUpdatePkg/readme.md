@@ -15,7 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 **MsCapsuleUpdatePkg** Package is an environment that implements:
 1.	Processing of (signed) UEFI capsules at boot time and runtime
 2.	Scalable FMP architecture
-3.	Support for FMP and System Table capsules
+3.	Support for FMP capsules
 4.	Support for Windows Firmware Update Display capsules
 5.	Firmware update progress display (text or graphical)
 6.	Capsule update and FMP policies
@@ -72,11 +72,9 @@ Implements entry points for processing capsules at boot time and runtime.
 
 `ProcessCapsules()` is an entry point for processing FMP and Windows Firmware Update Display capsules at boot time.
 
-`LocateAndProcessSystemTableCapsules()` is an entry point for processing System Table capsules at boot time.
-
 `ProcessCapsuleImage()` is an entry point for processing FMP and Windows Firmware Update Display capsules at runtime.
 
-This library implementation is similar to EDK2's implementation, but with following differences/additions: supporting system table capsules, not supporting drivers embedded in the capsule and only supporting one payload per capsule.
+This library implementation is similar to EDK2's implementation, but with following differences/additions: not supporting drivers embedded in the capsule and only supporting one payload per capsule.
 
 ### DisplayUpdateProgressTextLib.inf
 
@@ -119,16 +117,6 @@ Definition: MsCapsuleUpdatePkg\Include\Library\FmpPolicyLib.h
 Implementation: MsCapsuleUpdatePkg\Library\FmpPolicyLib
 
 Implements (null) interface for FMP policies such as whether to check for Lowest Supported Version (LSV) or to lock FMP device at ReadyToBoot event.  This sample implementation will be replaced by platform specific implementation.
-
-### CapsuleKeyBaseLib.inf
-
-LIBRARY_CLASS: `CapsuleKeyLib`
-
-Definition: MsCapsuleUpdatePkg\Include\Library\CapsuleKeyLib.h
-
-Implementation: MsCapsuleUpdatePkg\Library\CapsuleKeyBaseLib
-
-Contains public key certificates used for authenticating development and/or production capsules.
 
 ### BaseBmpSupportLib.inf
 

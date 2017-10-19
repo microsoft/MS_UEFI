@@ -61,6 +61,16 @@ FmpWrapperDeviceLib.inf         (MsCapsuleUpdatePkg's common-code library includ
 SampleFmpDeviceLib.inf          (FMP instance unique to this FMP driver and implements all the required hooks)
 ```
 
+### CapsuleKeyBaseLib.inf
+
+LIBRARY_CLASS: `CapsuleKeyLib`
+
+Definition: MsCapsuleUpdatePkg\Include\Library\CapsuleKeyLib.h
+
+Implementation: MsSampleFmpDevicePkg\Library\CapsuleKeyBaseLib
+
+Contains public key certificates used for authenticating development and/or production capsules.
+
 ## Nt32Pkg\Nt32PkgMsCapsule.dsc, Nt32Pkg/Nt32PkgMsCapsule.fdf, MsSampleFmpDevicePkg\MsSampleFmpDevicePkg.dsc & MsSampleFmpDevicePkg\MsSampleFmpDevicePkg.dec
 
 Nt32PkgMsCapsule.dsc points to Nt32Pkg\Nt32PkgMsCapsule.fdf, links all the required libraries for `MsCapsuleUpdatePkg`, compiles SampleDeviceLibWrapperFMP.inf, EfiSystemResourceTableDxe.inf and BootGraphicsResourceTableDxe.inf drivers and sets `gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed` accordingly.  Each FMP wrapper driver including SampleDeviceLibWrapperFMP.inf will refer to its own FMP library instance, Device GUID, Device Name, Lowest Supported Version, update progress display color and whether system reset is required after the device update (an example shown below).
@@ -102,7 +112,7 @@ Note: all sample tools provided in MsSampleFmpDevicePkg\Tools should not be used
 1.	Change directory to MsSampleFmpDevicePkg\Tools
 2.	Run MakeCert.bat to create private keys (*.pfx) and public key certificates (*.cer)
 3.	Run ConvertCerToH.py to create Certs.h
-4.	Copy Certs.h to MsCapsuleUpdatePkg\Library\CapsuleKeyBaseLib
+4.	Copy Certs.h to MsSampleFmpDevicePkg\Library\CapsuleKeyBaseLib
 5.	Run GenerateGuid.py to generate a GUID in Guid.txt
 6.	Replace #s in Nt32Pkg\Nt32PkgMsCapsule.dsc and MsSampleFmpDevicePkg\MsSampleFmpDevicePkg.dsc by GUID in Guid.txt
 7.	Run CapsuleGeneratorDevelopment.bat to create sample development capsule (*.cap)

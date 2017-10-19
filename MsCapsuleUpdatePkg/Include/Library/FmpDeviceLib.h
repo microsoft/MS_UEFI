@@ -68,9 +68,8 @@ RegisterFmpInstaller(
 
   
 /**
-Used to get the size of the image in bytes.  
-NOTE - Do not return zero as that will identify the device as 
-not updatable.  
+Used to get the size of the image in bytes as returned by GetImage().
+If the image size is indeterminate, return 0.
 
 @retval UINTN that represents the size of the firmware.  
 
@@ -82,6 +81,7 @@ FmpDeviceGetSize();
 /**
 Used to return a library supplied guid that will be the ImageTypeId guid of the FMP descriptor.  
 This is optional but can be used if at runtime the guid needs to be determined.  
+If not specified, guid from PcdDeviceLibWrapperDeviceGuid will be used.
 
 @param  Guid:  Double Guid Ptr that will be updated to point to guid.  This should be from static memory
                and will not be freed.  
