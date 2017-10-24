@@ -128,16 +128,6 @@ Implementation: MsCapsuleUpdatePkg\Library\BaseBmpSupportLib
 
 Converts BMP graphics image to GOP blt.  It is called from DxeCapsuleLib.inf when processing Windows Firmware Update Display capsules.
 
-### SafeBaseLib.inf
-
-LIBRARY_CLASS: `MsSafeBaseLib`
-
-Definition: MsCapsuleUpdatePkg\Include\Library\MsSafeBaseLib.h
-
-Implementation: MsCapsuleUpdatePkg\Library\BaseMsSafeBaseLib
-
-Implements helper functions used by BaseBmpSupportLib.inf.
-
 ### FmpHelperDxeLib.inf
 
 LIBRARY_CLASS: `FmpHelperLib`
