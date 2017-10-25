@@ -1,0 +1,68 @@
+## @file
+# Library to support "Special Pool" in UEFI.  This is analogous to Windows Kernel Special Pool.
+#
+# Must be linked anonamously to DXE_MAIN.
+#
+# @copyright
+# Copyright (c) 2016, 2017 Microsoft Corporation. All rights reserved
+##
+
+
+[Defines]
+  INF_VERSION       = 0x00010017
+  BASE_NAME         = EfiSpecialPoolLib
+  FILE_GUID         = 0e86cfda-ffb4-458a-9f25-cba4b3f36474
+  VERSION_STRING    = 1.0
+  MODULE_TYPE       = DXE_CORE
+  LIBRARY_CLASS     = EFiSpecialPoolLib | DXE_CORE
+  CONSTRUCTOR       = EfiSpecialPoolConstructor
+
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PcdLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EfiSpecialPoolPkg/EfiSpecialPoolPkg.dec
+
+[Sources.common]
+  SpecialPoolLib.c
+  SpecialPoolLib.h
+
+[Sources.X64]
+  X64/VirtualMemory.c
+  X64/VirtualMemory.h
+  X64/WriteTr.asm
+
+[Sources.IPF]
+  Ipf/VirtualMemory.c
+
+[Sources.EBC]
+  Ebc/VirtualMemory.c
+
+[Sources.Ia32]
+  Ia32/VirtualMemory.c
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/VirtualMemory.c
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolOverrun
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolTrapPage0
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolStartRange
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolEndRange
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolTypes
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolStackFaultHandling
+
+[Guids]
+  gEfiHobMemoryAllocStackGuid
+
+#[BuildOptions]
+#  DEBUG_VS2015x86_*_CC_FLAGS     = /Od /FAcs
+

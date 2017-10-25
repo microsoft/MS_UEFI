@@ -1,0 +1,90 @@
+##
+# Copyright (c) 2016-2017, Microsoft Corporation
+
+# All rights reserved.
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+##
+
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = EfiSpecialPoolPkg
+  PACKAGE_GUID                   = 3e11efd9-58fd-4806-891d-44a871658969
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+
+[Guids]
+  ## Efi SPecial Pool Package token space guid
+  #  Include/Guid/EfiSpecialPoolPkgTokenSpace.h
+  #  {673fa26b-a9b6-4c63-844d-ab5c4926e26b}
+  gEfiSpecialPoolPkgTokenSpaceGuid = { 0x673fa26b, 0xa9b6, 0x4c63, {0x84, 0x4d, 0xab, 0x5c, 0x49, 0x26, 0xe2, 0x6b}}
+
+
+[PcdsDynamicEx]
+
+[PcdsFixedAtBuild]
+  ## This flag defines whether Special Pool traps for buffer overrun, or buffer underrun
+  #  If this PCD is set to TRUE then the data is set a the end of a page, if FALSE, then the data is
+  #  set to the beginning of a page.
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolOverrun|TRUE|BOOLEAN|0x30001051
+
+  ## This flag defines whether Special Pool traps references to page 0
+  #  If this PCD is set to TRUE then any reference to memory from 0x0-0xfff will cause an exception.
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolTrapPage0|TRUE|BOOLEAN|0x30001052
+
+  ## This flag defines the lower address limit where Special Pool applies
+  # The start range starts at the 2MB boundary at or below the specified start range
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolStartRange|0x00000000|UINT64|0x30001053
+
+  ## This flag defines the upper address limit where Special Pool applies
+  # The end range ends at the 2MB boundary at or above the specified end range
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolEndRange|0x90000000|UINT64|0x30001054
+
+  ## This flag defines the upper address limit where Special Pool applies
+  #
+  # Any of the following may be used, however, some will not make sense as only allocations
+  # by AllocatePool are monitored (ie AllocatePages is not monitored, at least not yet)
+  #
+  # EfiReservedMemoryType                       1
+  # EfiLoaderCode                               2
+  # EfiLoaderData                               4
+  # EfiBootServicesCode                         8
+  # EfiBootServicesData                        10
+  # EfiRuntimeServicesCode                     20
+  # EfiRuntimeServicesData                     40
+  # EfiConventionalMemory                      80
+  # EfiUnusableMemory                         100
+  # EfiACPIReclaimMemory                      200
+  # EfiACPIMemoryNVS                          400
+  # EfiMemoryMappedIO                         800
+  # EfiMemoryMappedIOPortSpace               1000
+  # EfiPalCode                               2000
+  # EfiPersistentMemory                      4000
+  #
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolTypes|0x00000010|UINT32|0x30001055
+
+  ## This flag enables or disables StackFault handing
+  gEfiSpecialPoolPkgTokenSpaceGuid.PcdSpecialPoolStackFaultHandling|TRUE|BOOLEAN|0x30001056
+
+[PcdsFeatureFlag]
