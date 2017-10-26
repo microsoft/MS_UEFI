@@ -158,9 +158,7 @@
   MdePkg/Library/SmmPciExpressLib/SmmPciExpressLib.inf
   MdePkg/Library/SmiHandlerProfileLibNull/SmiHandlerProfileLibNull.inf
 
-  # MS_CHANGE Begin
   MdePkg/Library/IntSafeLib/IntSafeLib.inf
-  # MS_CHANGE End
 
 [Components.IPF]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
