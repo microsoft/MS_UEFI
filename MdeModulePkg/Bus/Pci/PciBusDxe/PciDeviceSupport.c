@@ -45,8 +45,8 @@ DisableBmeOnTree (
     //
     DisableBmeOnTree(&PciIoDevice->ChildList);
 
-    // If this is a P2P Bridge, disable the Bridge's Bus Master.
-    if (IS_PCI_BRIDGE(&PciIoDevice->Pci)) {
+    // If this is a device that supports BME, disable BME on this device.
+    if (PciIoDevice->Supports & EFI_PCI_IO_ATTRIBUTE_BUS_MASTER) {
       PCI_READ_COMMAND_REGISTER(PciIoDevice, &Command);
       if (EFI_PCI_COMMAND_BUS_MASTER == (Command & EFI_PCI_COMMAND_BUS_MASTER)) {
         Command &= ~EFI_PCI_COMMAND_BUS_MASTER;
