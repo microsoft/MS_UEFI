@@ -490,7 +490,6 @@ SmmEntryPoint (
   VOID                        *CommunicationBuffer;
   UINTN                       BufferSize;
 
-  PERF_START (NULL, "SMM", NULL, 0) ;
 
   //
   // Update SMST with contents of the SmmEntryContext structure
@@ -580,7 +579,6 @@ SmmEntryPoint (
     gSmmCorePrivate->InSmm = FALSE;
   }
 
-  PERF_END (NULL, "SMM", NULL, 0) ;
 }
 
 /**

@@ -636,57 +636,6 @@ BdsFormalizeEfiGlobalVariable (
 
 /**
 
-  Allocate a block of memory that will contain performance data to OS.
-
-**/
-VOID
-BdsAllocateMemoryForPerformanceData (
-  VOID
-  )
-{
-  EFI_STATUS                    Status;
-  EFI_PHYSICAL_ADDRESS          AcpiLowMemoryBase;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
-
-  AcpiLowMemoryBase = 0x0FFFFFFFFULL;
-
-  //
-  // Allocate a block of memory that will contain performance data to OS.
-  //
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (PERF_DATA_MAX_LENGTH),
-                  &AcpiLowMemoryBase
-                  );
-  if (!EFI_ERROR (Status)) {
-    //
-    // Save the pointer to variable for use in S3 resume.
-    //
-    Status = BdsDxeSetVariableAndReportStatusCodeOnError (
-               L"PerfDataMemAddr",
-               &gPerformanceProtocolGuid,
-               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-               sizeof (EFI_PHYSICAL_ADDRESS),
-               &AcpiLowMemoryBase
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[Bds] PerfDataMemAddr (%08x) cannot be saved to NV storage.\n", AcpiLowMemoryBase));
-    }
-    //
-    // Mark L"PerfDataMemAddr" variable to read-only if the Variable Lock protocol exists
-    // Still lock it even the variable cannot be saved to prevent it's set by 3rd party code.
-    //
-    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
-    if (!EFI_ERROR (Status)) {
-      Status = VariableLock->RequestToLock (VariableLock, L"PerfDataMemAddr", &gPerformanceProtocolGuid);
-      ASSERT_EFI_ERROR (Status);
-    }
-  }
-}
-
-/**
-
   Service routine for BdsInstance->Entry(). Devices are connected, the
   consoles are initialized, and the boot options are tried.
 
@@ -727,13 +676,9 @@ BdsEntry (
   //
   // Insert the performance probe
   //
-  PERF_END (NULL, "DXE", NULL, 0);
-  PERF_START (NULL, "BDS", NULL, 0);
+  PERF_CROSSMODULE_END (PERF_VERBOSITY_LOW, "DXE");
+  PERF_CROSSMODULE_BEGIN (PERF_VERBOSITY_LOW, "BDS");
   DEBUG ((EFI_D_INFO, "[Bds] Entry...\n"));
-
-  PERF_CODE (
-    BdsAllocateMemoryForPerformanceData ();
-  );
 
   //
   // Fill in FirmwareVendor and FirmwareRevision from PCDs
@@ -894,9 +839,9 @@ BdsEntry (
   // > Signal ReadyToLock event
   // > Authentication action: 1. connect Auth devices; 2. Identify auto logon user.
   //
-  PERF_START (NULL, "PlatformBootManagerBeforeConsole", "BDS", 0);
+  PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "PlatformBootManagerBeforeConsole");
   PlatformBootManagerBeforeConsole ();
-  PERF_END   (NULL, "PlatformBootManagerBeforeConsole", "BDS", 0);
+  PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "PlatformBootManagerBeforeConsole");
 
   //
   // Initialize hotkey service
@@ -913,7 +858,7 @@ BdsEntry (
   //
   // Connect consoles
   //
-  PERF_START (NULL, "EfiBootManagerConnectAllDefaultConsoles", "BDS", 0);
+  PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "EfiBootManagerConnectAllDefaultConsoles");
   if (PcdGetBool (PcdConInConnectOnDemand)) {
     EfiBootManagerConnectConsoleVariable (ConOut);
     EfiBootManagerConnectConsoleVariable (ErrOut);
@@ -923,7 +868,7 @@ BdsEntry (
   } else {
     EfiBootManagerConnectAllDefaultConsoles ();
   }
-  PERF_END   (NULL, "EfiBootManagerConnectAllDefaultConsoles", "BDS", 0);
+  PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "EfiBootManagerConnectAllDefaultConsoles");
 
   //
   // Do the platform specific action after the console is ready
@@ -936,9 +881,9 @@ BdsEntry (
   // > Dispatch aditional option roms
   // > Special boot: e.g.: USB boot, enter UI
   // 
-  PERF_START (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+  PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "PlatformBootManagerAfterConsole");
   PlatformBootManagerAfterConsole ();
-  PERF_END   (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+  PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "PlatformBootManagerAfterConsole");
   //
   // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
   //
@@ -1031,9 +976,9 @@ BdsEntry (
     //
     // Execute Key####
     //
-    PERF_START (NULL, "BdsWait", "BDS", 0);
+    PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "BdsWait");
     BdsWait (HotkeyTriggered);
-    PERF_END   (NULL, "BdsWait", "BDS", 0);
+    PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "BdsWait");
 
     //
     // BdsReadKeys() can be removed after all keyboard drivers invoke callback in timer callback.

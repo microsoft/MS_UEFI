@@ -60,7 +60,7 @@
   MemoryAllocationLib
   PcdLib
   SmmCorePlatformHookLib
-  PerformanceLib
+  Performance2Lib
   TimerLib
   HobLib
   SmmMemLib

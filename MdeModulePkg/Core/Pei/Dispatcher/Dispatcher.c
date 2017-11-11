@@ -982,6 +982,7 @@ PeiDispatcher (
           Private->CurrentFileHandle   = PeimFileHandle;
           Private->CurrentPeimFvCount  = Index1;
           Private->CurrentPeimCount    = Index2;
+          PERF_LOADIMAGE_BEGIN ();
           Status = PeiLoadImage (
                     (CONST EFI_PEI_SERVICES **) &Private->Ps,
                     PeimFileHandle,
@@ -990,6 +991,7 @@ PeiDispatcher (
                     &AuthenticationState
                     );
           if (Status == EFI_SUCCESS) {
+            PERF_LOADIMAGE_END (PeimFileHandle);
             //
             // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
             //
@@ -999,9 +1001,9 @@ PeiDispatcher (
             //
             PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
 
-            PERF_START (PeimFileHandle, "PEIM", NULL, 0);
+            PERF_ENTRYPOINT_BEGIN (PeimFileHandle);
             PeimEntryPoint(PeimFileHandle, (const EFI_PEI_SERVICES **) &Private->Ps);
-            PERF_END (PeimFileHandle, "PEIM", NULL, 0);
+            PERF_ENTRYPOINT_END (PeimFileHandle);
           }
 
           //
@@ -1096,6 +1098,7 @@ PeiDispatcher (
               //
               // For PEIM driver, Load its entry point
               //
+              PERF_LOADIMAGE_BEGIN ();
               Status = PeiLoadImage (
                          PeiServices,
                          PeimFileHandle,
@@ -1104,11 +1107,12 @@ PeiDispatcher (
                          &AuthenticationState
                          );
               if (Status == EFI_SUCCESS) {
+                PERF_LOADIMAGE_END (PeimFileHandle);
                 //
                 // The PEIM has its dependencies satisfied, and its entry point
                 // has been found, so invoke it.
                 //
-                PERF_START (PeimFileHandle, "PEIM", NULL, 0);
+                PERF_ENTRYPOINT_BEGIN (PeimFileHandle);
 
                 REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                   EFI_PROGRESS_CODE,
@@ -1144,7 +1148,7 @@ PeiDispatcher (
                   (VOID *)(&PeimFileHandle),
                   sizeof (PeimFileHandle)
                   );
-                PERF_END (PeimFileHandle, "PEIM", NULL, 0);
+                PERF_ENTRYPOINT_END (PeimFileHandle);
 
               }
             }
@@ -1170,11 +1174,11 @@ PeiDispatcher (
               // If memory is available we shadow images by default for performance reasons.
               // We call the entry point a 2nd time so the module knows it's shadowed.
               //
-              //PERF_START (PeiServices, L"PEIM", PeimFileHandle, 0);
               if ((Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME) && !PcdGetBool (PcdShadowPeimOnBoot)) {
                 //
                 // Load PEIM into Memory for Register for shadow PEIM.
                 //
+                PERF_LOADIMAGE_BEGIN ();
                 Status = PeiLoadImage (
                            PeiServices,
                            PeimFileHandle,
@@ -1183,12 +1187,14 @@ PeiDispatcher (
                            &AuthenticationState
                            );
                 if (Status == EFI_SUCCESS) {
+                  PERF_LOADIMAGE_END (PeimFileHandle);
                   PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
                 }
               }
               ASSERT (PeimEntryPoint != NULL);
+              PERF_ENTRYPOINT_BEGIN (PeimFileHandle);
               PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
-              //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);
+              PERF_ENTRYPOINT_END (PeimFileHandle);
 
               //
               // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE

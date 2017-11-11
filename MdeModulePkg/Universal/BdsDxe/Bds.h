@@ -37,7 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
-#include <Library/PerformanceLib.h>
+#include <Library/Performance2Lib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 

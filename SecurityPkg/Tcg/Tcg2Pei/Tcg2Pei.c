@@ -40,13 +40,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Protocol/Tcg2Protocol.h>
-#include <Library/PerformanceLib.h>
+#include <Library/Performance2Lib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/ResetSystemLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
-
-#define PERF_ID_TCG2_PEI  0x3080
 
 typedef struct {
   EFI_GUID                   *EventGuid;
@@ -161,6 +159,8 @@ EndofPeiSignalNotifyCallBack (
 {  
   MEASURED_HOB_DATA *MeasuredHobData;
 
+  PERF_CALLBACK_BEGIN(PERF_VERBOSITY_STANDARD, &gEfiEndOfPeiSignalPpiGuid);
+
   MeasuredHobData = NULL;
 
   //
@@ -187,6 +187,8 @@ EndofPeiSignalNotifyCallBack (
     //
     CopyMem (&MeasuredHobData->MeasuredFvBuf[mMeasuredBaseFvIndex] , mMeasuredChildFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredChildFvIndex));
   }
+
+  PERF_CALLBACK_END(PERF_VERBOSITY_STANDARD, &gEfiEndOfPeiSignalPpiGuid);
 
   return EFI_SUCCESS;
 }
@@ -641,7 +643,7 @@ MeasureMainBios (
   EFI_FV_INFO                       VolumeInfo;
   EFI_PEI_FIRMWARE_VOLUME_PPI       *FvPpi;
 
-  PERF_START_EX (mFileHandle, "EventRec", "Tcg2Pei", 0, PERF_ID_TCG2_PEI);
+  PERF_FUNCTION_BEGIN (PERF_VERBOSITY_STANDARD);
 
   //
   // Only measure BFV at the very beginning. Other parts of Static Core Root of
@@ -672,7 +674,7 @@ MeasureMainBios (
 
   Status = MeasureFvImage ((EFI_PHYSICAL_ADDRESS) (UINTN) VolumeInfo.FvStart, VolumeInfo.FvSize);
 
-  PERF_END_EX (mFileHandle, "EventRec", "Tcg2Pei", 0, PERF_ID_TCG2_PEI + 1);
+  PERF_FUNCTION_END (PERF_VERBOSITY_STANDARD);
 
   return Status;
 }

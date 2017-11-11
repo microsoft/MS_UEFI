@@ -48,6 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/RecoveryLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Library/Performance2Lib.h>
 
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000

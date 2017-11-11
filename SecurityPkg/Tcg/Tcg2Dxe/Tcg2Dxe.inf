@@ -63,7 +63,7 @@
   UefiLib
   Tpm2DeviceLib
   HashLib
-  PerformanceLib
+  Performance2Lib
   ReportStatusCodeLib
   Tcg2PhysicalPresenceLib
   PeCoffLib

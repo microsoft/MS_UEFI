@@ -61,7 +61,7 @@
   PeCoffGetEntryPointLib
   ReportStatusCodeLib
   PeiServicesLib
-  PerformanceLib
+  Performance2Lib
   HobLib
   BaseLib
   PeiCoreEntryPoint

@@ -55,7 +55,7 @@
   PeiServicesTablePointerLib
   Tpm2DeviceLib
   HashLib
-  PerformanceLib
+  Performance2Lib
   MemoryAllocationLib
   ReportStatusCodeLib
   Tcg2PhysicalPresenceLib

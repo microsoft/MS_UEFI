@@ -47,11 +47,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/HashLib.h>
-#include <Library/PerformanceLib.h>
+#include <Library/Performance2Lib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
-
-#define PERF_ID_TCG2_DXE  0x3120
 
 typedef struct {
   CHAR16                                 *VariableName;
@@ -2256,7 +2254,7 @@ OnReadyToBoot (
   EFI_STATUS                        Status;
   TPM_PCRINDEX                      PcrIndex;
 
-  PERF_START_EX (mImageHandle, "EventRec", "Tcg2Dxe", 0, PERF_ID_TCG2_DXE);
+  PERF_FUNCTION_BEGIN (PERF_VERBOSITY_STANDARD);
   if (mBootAttempts == 0) {
 
     //
@@ -2338,7 +2336,7 @@ OnReadyToBoot (
   // Increase boot attempt counter.
   //
   mBootAttempts++;
-  PERF_END_EX (mImageHandle, "EventRec", "Tcg2Dxe", 0, PERF_ID_TCG2_DXE + 1);
+  PERF_FUNCTION_END (PERF_VERBOSITY_STANDARD);
 }
 
 /**

@@ -418,12 +418,14 @@ CoreDispatcher (
   EFI_CORE_DRIVER_ENTRY           *DriverEntry;
   BOOLEAN                         ReadyToRun;
   EFI_EVENT                       DxeDispatchEvent;
-  
+
+  PERF_FUNCTION_BEGIN (PERF_VERBOSITY_STANDARD);
 
   if (gDispatcherRunning) {
     //
     // If the dispatcher is running don't let it be restarted.
     //
+    PERF_FUNCTION_END (PERF_VERBOSITY_STANDARD);
     return EFI_ALREADY_STARTED;
   }
 
@@ -438,6 +440,7 @@ CoreDispatcher (
              &DxeDispatchEvent
              );
   if (EFI_ERROR (Status)) {
+    PERF_FUNCTION_END (PERF_VERBOSITY_STANDARD);
     return Status;
   }
 
@@ -583,6 +586,8 @@ CoreDispatcher (
   CoreCloseEvent (DxeDispatchEvent);
 
   gDispatcherRunning = FALSE;
+
+  PERF_FUNCTION_END (PERF_VERBOSITY_STANDARD);
 
   return ReturnStatus;
 }
@@ -1349,6 +1354,7 @@ CoreInitializeDispatcher (
   VOID
   )
 {
+  PERF_FUNCTION_BEGIN (PERF_VERBOSITY_STANDARD);
   mFwVolEvent = EfiCreateProtocolNotifyEvent (
                   &gEfiFirmwareVolume2ProtocolGuid,
                   TPL_CALLBACK,
@@ -1356,6 +1362,7 @@ CoreInitializeDispatcher (
                   NULL,
                   &mFwVolEventRegistration
                   );
+  PERF_FUNCTION_END (PERF_VERBOSITY_STANDARD);
 }
 
 //

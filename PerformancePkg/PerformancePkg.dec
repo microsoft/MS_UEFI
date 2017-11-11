@@ -31,7 +31,22 @@
   ## Include/Guid/TscFrequency.h
   gEfiTscFrequencyGuid                = { 0xdba6a7e3, 0xbb57, 0x4be7, { 0x8a, 0xf8, 0xd5, 0x78, 0xdb, 0x7e, 0x56, 0x87 }}
 
+  ## Include/Protocol/Performance2.h
+  gPerformance2ProtocolGuid      = { 0x13b70aae, 0xc04e, 0x4264, { 0x9e, 0x5e, 0x14, 0x87, 0xd,  0xba, 0xfb, 0x78 } }
+
+  ## Include/Guid/PeiPerformanceHob.h
+  gPeiPerformanceHobGuid            = { 0x75a3fc2e, 0xa74b, 0x455a, { 0x80, 0x79, 0xfb, 0x68, 0x38, 0x57, 0xcc, 0x41}}
+
+[Ppis]
+  ## Include/Ppi/PerformancePpi.h
+  gPerformancePpiGuid = { 0x82e1fb66, 0xce5d, 0x49fc, { 0xba, 0x8f, 0xac, 0x98, 0x82, 0xbf, 0x2f, 0x62 } }
+
 [PcdsFixedAtBuild]
   ##  The base address of the ACPI registers within the ICH PCI space.
   #   This space must be 128-byte aligned.
   gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress|0x400|UINT16|1
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Maximum size of the performance log (in bytes) during PEI phase.
+  # @Prompt Maximum size of PEI performance log.
+  gPerformancePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogSize|0|UINT16|0x00010036

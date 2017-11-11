@@ -33,7 +33,6 @@
 #
 
 [Sources]
-  BmPerformance.c
   BmConnect.c
   BmMisc.c
   BmConsole.c
@@ -58,7 +57,7 @@
   PrintLib
   BaseMemoryLib
   DevicePathLib
-  PerformanceLib
+  Performance2Lib
   PeCoffGetEntryPointLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
@@ -66,7 +65,6 @@
   MemoryAllocationLib
   DxeServicesLib
   ReportStatusCodeLib
-  PerformanceLib
   HiiLib
   SortLib
 

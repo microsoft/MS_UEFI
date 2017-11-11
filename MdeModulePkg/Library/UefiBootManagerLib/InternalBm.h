@@ -65,7 +65,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HobLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/PerformanceLib.h>
+#include <Library/Performance2Lib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/UefiBootManagerLib.h>
@@ -73,7 +73,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DxeServicesLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/CapsuleLib.h>
-#include <Library/PerformanceLib.h>
 #include <Library/HiiLib.h>
 
 #if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
@@ -182,22 +181,6 @@ EFI_STATUS
 BmGetFreeOptionNumber (
   IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType,
   OUT UINT16                            *FreeOptionNumber
-  );
-
-/**
-
-  Writes performance data of booting into the allocated memory.
-  OS can process these records.
-
-  @param  Event                 The triggered event.
-  @param  Context               Context for this event.
-
-**/
-VOID
-EFIAPI
-BmWriteBootToOsPerformanceData (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
   );
 
 /**

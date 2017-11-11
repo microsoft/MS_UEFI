@@ -1436,13 +1436,9 @@ CoreLoadImage (
   )
 {
   EFI_STATUS    Status;
-  UINT64        Tick;
   EFI_HANDLE    Handle;
 
-  Tick = 0;
-  PERF_CODE (
-    Tick = GetPerformanceCounter ();
-  );
+  PERF_LOADIMAGE_BEGIN ();
 
   Status = CoreLoadImageCommon (
              BootPolicy,
@@ -1465,8 +1461,7 @@ CoreLoadImage (
     Handle = *ImageHandle;
   }
 
-  PERF_START (Handle, "LoadImage:", NULL, Tick);
-  PERF_END (Handle, "LoadImage:", NULL, 0);
+  PERF_LOADIMAGE_END (Handle);
 
   return Status;
 }
@@ -1526,13 +1521,9 @@ CoreLoadImageEx (
   )
 {
   EFI_STATUS    Status;
-  UINT64        Tick;
   EFI_HANDLE    Handle;
 
-  Tick = 0;
-  PERF_CODE (
-    Tick = GetPerformanceCounter ();
-  );
+  PERF_LOADIMAGE_BEGIN ();
 
   Status = CoreLoadImageCommon (
            TRUE,
@@ -1555,8 +1546,7 @@ CoreLoadImageEx (
     Handle = *ImageHandle;
   }
 
-  PERF_START (Handle, "LoadImage:", NULL, Tick);
-  PERF_END (Handle, "LoadImage:", NULL, 0);
+  PERF_LOADIMAGE_END (Handle);
 
   return Status;
 }
@@ -1594,10 +1584,8 @@ CoreStartImage (
   LOADED_IMAGE_PRIVATE_DATA     *LastImage;
   UINT64                        HandleDatabaseKey;
   UINTN                         SetJumpFlag;
-  UINT64                        Tick;
   EFI_HANDLE                    Handle;
 
-  Tick = 0;
   Handle = ImageHandle;
 
   Image = CoreLoadedImageInfo (ImageHandle);
@@ -1621,9 +1609,7 @@ CoreStartImage (
     return EFI_UNSUPPORTED;
   }
 
-  PERF_CODE (
-    Tick = GetPerformanceCounter ();
-  );
+  PERF_ENTRYPOINT_BEGIN (Handle);
 
 
   //
@@ -1647,8 +1633,7 @@ CoreStartImage (
     // Image may be unloaded after return with failure,
     // then ImageHandle may be invalid, so use NULL handle to record perf log.
     //
-    PERF_START (NULL, "StartImage:", NULL, Tick);
-    PERF_END (NULL, "StartImage:", NULL, 0);
+    PERF_ENTRYPOINT_END (Handle);
 
     //
     // Pop the current start image context
@@ -1740,6 +1725,8 @@ CoreStartImage (
   //
   Status = Image->Status;
 
+  PERF_ENTRYPOINT_END (Handle);
+
   //
   // If the image returned an error, or if the image is an application
   // unload it
@@ -1755,8 +1742,7 @@ CoreStartImage (
   //
   // Done
   //
-  PERF_START (Handle, "StartImage:", NULL, Tick);
-  PERF_END (Handle, "StartImage:", NULL, 0);
+
   return Status;
 }
 

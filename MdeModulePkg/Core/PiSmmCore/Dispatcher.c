@@ -321,12 +321,8 @@ SmmLoadImage (
   EFI_DEVICE_PATH_PROTOCOL       *HandleFilePath;
   EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
   PE_COFF_LOADER_IMAGE_CONTEXT   ImageContext;
-  UINT64                         Tick;
 
-  Tick = 0;
-  PERF_CODE (
-    Tick = GetPerformanceCounter ();
-  );
+  PERF_LOADIMAGE_BEGIN ();
    
   Buffer               = NULL;
   Size                 = 0;
@@ -641,8 +637,7 @@ SmmLoadImage (
              &DriverEntry->SmmLoadedImage
              );
 
-  PERF_START (DriverEntry->ImageHandle, "LoadImage:", NULL, Tick);
-  PERF_END (DriverEntry->ImageHandle, "LoadImage:", NULL, 0);
+  PERF_LOADIMAGE_END (DriverEntry->ImageHandle);
 
   //
   // Print the load address and the PDB file name if it is available
@@ -909,9 +904,9 @@ SmmDispatcher (
       // For each SMM driver, pass NULL as ImageHandle
       //
       RegisterSmramProfileImage (DriverEntry, TRUE);
-      PERF_START (DriverEntry->ImageHandle, "StartImage:", NULL, 0);
+      PERF_ENTRYPOINT_BEGIN (DriverEntry->ImageHandle);
       Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, gST);
-      PERF_END (DriverEntry->ImageHandle, "StartImage:", NULL, 0);
+      PERF_ENTRYPOINT_END (DriverEntry->ImageHandle);
       if (EFI_ERROR(Status)){
         UnregisterSmramProfileImage (DriverEntry, TRUE);
         SmmFreePages(DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);

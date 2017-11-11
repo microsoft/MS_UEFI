@@ -81,7 +81,7 @@
   BaseMemoryLib
   CacheMaintenanceLib
   UefiDecompressLib
-  PerformanceLib
+  Performance2Lib
   HobLib
   BaseLib
   UefiLib

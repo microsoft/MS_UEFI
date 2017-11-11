@@ -35,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
 #include <Library/HobLib.h>
-#include <Library/PerformanceLib.h>
+#include <Library/Performance2Lib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PeCoffLib.h>

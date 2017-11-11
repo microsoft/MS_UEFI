@@ -279,7 +279,9 @@ HandOffToDxeCore (
     //
     // End of PEI phase signal
     //
+    PERF_EVENTSIGNAL_BEGIN (PERF_VERBOSITY_STANDARD, &gEndOfPeiSignalPpi);
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
+    PERF_EVENTSIGNAL_END (PERF_VERBOSITY_STANDARD, &gEndOfPeiSignalPpi);
     ASSERT_EFI_ERROR (Status);
 
     AsmWriteCr3 (PageTables);

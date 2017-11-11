@@ -60,6 +60,10 @@
   PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
   PerformancePkg/Library/TscTimerLib/PeiTscTimerLib.inf
   PerformancePkg/Library/TscTimerLib/BaseTscTimerLib.inf
+  PerformancePkg/Library/CorePerformance2Lib/PeiCorePerformance2Lib.inf
+  PerformancePkg/Library/CorePerformance2Lib/DxeCorePerformance2Lib.inf
+  PerformancePkg/Library/PeiPerformance2Lib/PeiPerformance2Lib.inf
+  PerformancePkg/Library/DxePerformance2Lib/DxePerformance2Lib.inf
 
 [Components]
   PerformancePkg/Dp_App/Dp.inf

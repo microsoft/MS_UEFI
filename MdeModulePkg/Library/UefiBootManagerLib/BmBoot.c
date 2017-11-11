@@ -1673,7 +1673,6 @@ EfiBootManagerBoot (
   VOID                      *FileBuffer;
   UINTN                     FileSize;
   EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
-  EFI_EVENT                 LegacyBootEvent;
 
   if (BootOption == NULL) {
     return;
@@ -1739,7 +1738,7 @@ EfiBootManagerBoot (
     BmRepairAllControllers ();
   }
 
-  PERF_START_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
+  PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "BdsAttempt");
 
   //
   // 5. Adjust the different type memory page number just before booting
@@ -1813,28 +1812,12 @@ EfiBootManagerBoot (
   //
   if ((DevicePathType (BootOption->FilePath) == BBS_DEVICE_PATH) && (DevicePathSubType (BootOption->FilePath) == BBS_BBS_DP)) {
     if (mBmLegacyBoot != NULL) {
-      //
-      // Write boot to OS performance data for legacy boot.
-      //
-      PERF_CODE (
-        //
-        // Create an event to be signalled when Legacy Boot occurs to write performance data.
-        //
-        Status = EfiCreateEventLegacyBootEx(
-                   TPL_NOTIFY,
-                   BmWriteBootToOsPerformanceData,
-                   NULL, 
-                   &LegacyBootEvent
-                   );
-        ASSERT_EFI_ERROR (Status);
-      );
-
       mBmLegacyBoot (BootOption);
     } else {
       BootOption->Status = EFI_UNSUPPORTED;
     }
 
-    PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
+    PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "BdsAttempt");
     return;
   }
  
@@ -1859,12 +1842,12 @@ EfiBootManagerBoot (
   //
   gBS->SetWatchdogTimer (5 * 60, 0x0000, 0x00, NULL);
 
+  PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "BdsAttempt");
+  PERF_CROSSMODULE_END (PERF_VERBOSITY_LOW, "BDS");
   //
-  // Write boot to OS performance data for UEFI boot
+  // Keep logging BDS in case we'll re-enter this function later
   //
-  PERF_CODE (
-    BmWriteBootToOsPerformanceData (NULL, NULL);
-  );
+  PERF_CROSSMODULE_BEGIN (PERF_VERBOSITY_LOW, "BDS"); 
 
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderStart));
 
@@ -1880,7 +1863,6 @@ EfiBootManagerBoot (
       (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED)
       );
   }
-  PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
 
   //
   // Destroy the RAM disk

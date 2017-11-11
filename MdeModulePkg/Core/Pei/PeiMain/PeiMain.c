@@ -352,18 +352,16 @@ PeiCore (
   // Update performance measurements 
   //
   if (OldCoreData == NULL) {
-    PERF_START (NULL, "SEC", NULL, 1);
-    PERF_END   (NULL, "SEC", NULL, 0);
 
     //
     // If first pass, start performance measurement.
     //
-    PERF_START (NULL,"PEI",    NULL, 0);
-    PERF_START (NULL,"PreMem", NULL, 0);
+    PERF_CROSSMODULE_BEGIN (PERF_VERBOSITY_LOW, "PEI");
+    PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "PreMem");
 
   } else {
-    PERF_END   (NULL,"PreMem",  NULL, 0);
-    PERF_START (NULL,"PostMem", NULL, 0);
+    PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "PreMem");
+    PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "PostMem");
   }
 
   //
@@ -411,7 +409,7 @@ PeiCore (
     //
     // Alert any listeners that there is permanent memory available
     //
-    PERF_START (NULL,"DisMem", NULL, 0);
+    PERF_INMODULE_BEGIN (PERF_VERBOSITY_STANDARD, "DisMem");
     Status = PeiServicesInstallPpi (&mMemoryDiscoveredPpi);
 
     //
@@ -419,7 +417,7 @@ PeiCore (
     //
     ProcessNotifyList (&PrivateData);
 
-    PERF_END (NULL,"DisMem", NULL, 0);
+    PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "DisMem");
   }
 
   //
@@ -437,7 +435,7 @@ PeiCore (
   //
   // Measure PEI Core execution time.
   //
-  PERF_END (NULL, "PostMem", NULL, 0);
+  PERF_INMODULE_END (PERF_VERBOSITY_STANDARD, "PostMem");
 
   //
   // Lookup DXE IPL PPI
