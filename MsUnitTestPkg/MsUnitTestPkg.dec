@@ -39,6 +39,13 @@
 
 [LibraryClasses]
  
+  ## @libraryclass Provides a unit test framework
+  #
+  UnitTestLib|Include\Library\UnitTestLib.h
+
+  ## @libraryclass Provide unit test assert helpers
+  #
+  UnitTestAssertLib|Include\Library\UnitTestAssertLib.h
 
 [Guids]
 

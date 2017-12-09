@@ -67,6 +67,7 @@ SetUsbBootNext(
   if (DpEnd == NULL)
   {
     DEBUG((DEBUG_ERROR, __FUNCTION__ ": Unable to create device path.  DpEnd is NULL.\n"));
+    Status = EFI_OUT_OF_RESOURCES;
     goto CLEANUP;
   }
 
@@ -74,6 +75,7 @@ SetUsbBootNext(
   if (Dp == NULL)
   {
     DEBUG((DEBUG_ERROR, __FUNCTION__ ": Unable to create device path.  Dp is NULL.\n"));
+    Status = EFI_OUT_OF_RESOURCES;
     goto CLEANUP;
   }
 
