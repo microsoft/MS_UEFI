@@ -1,29 +1,35 @@
-# EDK II Project
+# On Screen Notifications
+## Copyright
 
-A modern, feature-rich, cross-platform firmware development environment
-for the UEFI and PI specifications from www.uefi.org.
+Copyright (c) 2017, Microsoft Corporation
 
-Contributions to the EDK II open source project are covered by the
-[TianoCore Contribution Agreement 1.1](Contributions.txt)
+All rights reserved. Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
-The majority of the content in the EDK II open source project uses a
-[BSD 2-Clause License](License.txt).  The EDK II open source project contains
-the following components that are covered by additional licenses:
-* [AppPkg/Applications/Python/Python-2.7.2/Tools/pybench](AppPkg/Applications/Python/Python-2.7.2/Tools/pybench/LICENSE)
-* [AppPkg/Applications/Python/Python-2.7.2](AppPkg/Applications/Python/Python-2.7.2/LICENSE)
-* [AppPkg/Applications/Python/Python-2.7.10](AppPkg/Applications/Python/Python-2.7.10/LICENSE)
-* [BaseTools/Source/C/BrotliCompress](BaseTools/Source/C/BrotliCompress/LICENSE)
-* [MdeModulePkg/Library/BrotliCustomDecompressLib](MdeModulePkg/Library/BrotliCustomDecompressLib/LICENSE)
-* [OvmfPkg](OvmfPkg/License.txt)
-* [CryptoPkg/Library/OpensslLib/openssl](CryptoPkg/Library/OpensslLib/openssl/LICENSE)
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-The EDK II Project is composed of packages.  The maintainers for each package
-are listed in [Maintainers.txt](Maintainers.txt).
+## About
 
-# Resources
-* [TianoCore](http://www.tianocore.org)
-* [EDK II](https://github.com/tianocore/tianocore.github.io/wiki/EDK-II)
-* [Getting Started with EDK II](https://github.com/tianocore/tianocore.github.io/wiki/Getting-Started-with-EDK-II)
-* [Mailing Lists](https://github.com/tianocore/tianocore.github.io/wiki/Mailing-Lists)
-* [TianoCore Bugzilla](https://bugzilla.tianocore.org)
-* [How To Contribute](https://github.com/tianocore/tianocore.github.io/wiki/How-To-Contribute)
+**OnScreenNotifications**
+
+The MsGraphicsPkg provides the necessary functions to display on screen notifications in the format of colored bars and bitmap icons. This can be used to give developers 
+a quick and easy visual indication of what modes are enabled/disabled on a particular device.
+
+This is implemented by using a UINT bitmask stored in a HOB to signify what modes are active.  You can add active modes to the HOB using the OnScreenNotificationLib.
+
+Once you are ready to display the notifications you will need to pass in the Frame Buffer, Pixels per scan line, Width, and Height of the frame buffer to the DisplayOnScreenNotifications function of the BaseDisplayOnScreenNotificationLib
+
+
+Addtional Notes:
+
+**MsGraphicsPkg\Include\Library\MsOnScreenNotificationLib.h**
+___
+In this header you should rename the modes to reflect what you are trying to display. We have kept SecureBoot as an example of how to use the OnScreenNotification library and how to incorporate an icon into the colored bar
+
+
+**MsGraphicsPkg\Include\Library\BaseDisplayOnScreenNotificationLib.c**
+___
+If you wish to change the colors used, fill options, or the height of the banners you will need to modify the #defines in BaseDisplayOnScreenNotificationLib.c
+
+To add new modes or remove unsupported modes you can modify the mSupportedNotifications array in BaseDisplayOnScreenNotificationLib.c
