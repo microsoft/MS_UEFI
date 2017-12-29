@@ -2,6 +2,8 @@
   This library is used by other modules to send TPM12 command.
 
 Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2017, Microsoft Corporation. All rights reserved. <BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -221,5 +223,28 @@ EFI_STATUS
 EFIAPI
 Tpm12GetCapabilityFlagVolatile (
   OUT TPM_STCLEAR_FLAGS                 *VolatileFlags
+  );
+
+/**
+Get TPM version from capability.
+
+@param[out] TpmVersion    A pointer to a TPM_VERSION structure to hold the base version info.
+@param[out] TpmMfg        [Optional] A UINT32 that will contain a big-endian encoding of the 4-byte mfg ID.
+                          (eg. for "TPM ", TpmMfg[0] == 'T', TpmMfg[1] == 'P', etc)
+@param[in,out]  VendorSpecificSize  [Optional] On input, the size of the buffer pointed to by VendorSpecificBuffer.
+                                    On output, the number of bytes copied into the buffer.
+@param[out]     VendorSpecificBuffer  [Optional] A caller-allocated buffer containing the vendor-specific data.
+
+@retval EFI_SUCCESS      Operation completed successfully.
+@retval EFI_DEVICE_ERROR The command was unsuccessful.
+
+**/
+EFI_STATUS
+EFIAPI
+Tpm12GetCapabilityFirmwareVersion (
+  OUT     TPM_VERSION   *TpmVersion,
+  OUT     UINT32        *TpmMfg OPTIONAL,
+  IN OUT  UINT16        *VendorSpecificSize OPTIONAL,
+  OUT     UINT8         *VendorSpecificBuffer OPTIONAL
   );
 #endif

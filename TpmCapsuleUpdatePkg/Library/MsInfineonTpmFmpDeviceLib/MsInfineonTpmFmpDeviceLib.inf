@@ -1,0 +1,198 @@
+## @file MsInfineonTpmFmpDeviceLib.inf
+# FMP driver library for Infineon dTPM device.
+# Largely implemented with sample code from Infineon.
+#
+##
+# Copyright (c) 2017, Microsoft Corporation
+#
+# All rights reserved.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+##
+
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = MsInfineonTpmFmpDeviceLib
+  FILE_GUID           = 2EA1D08B-7CE3-4DB8-BCC7-419AEB052547
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = DXE_DRIVER
+  LIBRARY_CLASS       = FmpDeviceLib|DXE_DRIVER
+  CONSTRUCTOR         = UefiDeviceLibraryConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+
+[Sources]
+  MsInfineonTpmFmpDeviceLib.c
+  Tpm12And20Shim.c
+  InfineonSpecificTpmCommands.c
+
+  # Infineon Includes
+  IfxDriverSource/Common/Crypt/Crypt.h
+  IfxDriverSource/Common/Crypt/StdInclude.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_FieldUpgradeInfoRequest.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_FieldUpgradeInfoRequest2.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_FieldUpgradeStart.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_FlushSpecific.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_GetCapability.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_GetTestResult.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_Marshal.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_OIAP.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_OSAP.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_OwnerReadInternalPub.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_Startup.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_Types.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_FieldUpgradeComplete.h
+  IfxDriverSource/Common/MicroTss/Tpm_1_2/TPM_FieldUpgradeUpdate.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_FieldUpgradeMarshal.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_FieldUpgradeStartVendor.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_FieldUpgradeTypes.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_FlushContext.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_GetCapability.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_GetTestResult.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_HierarchyChangeAuth.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_Marshal.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_PolicyCommandCode.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_PolicySecret.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_SetPrimaryPolicy.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_StartAuthSession.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_Startup.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/TPM2_Types.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/implementations.h
+  IfxDriverSource/Common/MicroTss/StdInclude.h
+  IfxDriverSource/Common/MicroTss/Tpm_2_0/swap.h
+  IfxDriverSource/Common/Platform/Platform.h
+  IfxDriverSource/Common/Platform/StdInclude.h
+  IfxDriverSource/Common/TpmDeviceAccess/DeviceAccess.h
+  IfxDriverSource/Common/TpmDeviceAccess/StdInclude.h
+  IfxDriverSource/Common/TpmDeviceAccess/TPM_TIS.h
+  IfxDriverSource/Common/DeviceManagement.h
+  IfxDriverSource/Common/Error.h
+  IfxDriverSource/Common/ErrorCodes.h
+  IfxDriverSource/Common/FirmwareImage.h
+  IfxDriverSource/Common/FirmwareUpdate.h
+  IfxDriverSource/Common/Globals.h
+  IfxDriverSource/Common/Globals_UEFI.h
+  IfxDriverSource/Common/Logging.h
+  IfxDriverSource/Common/PropertyStorage.h
+  IfxDriverSource/Common/TpmIO.h
+  IfxDriverSource/Common/Utility.h
+  IfxDriverSource/IFXTPMUpdate/UEFI/IFXTPMUpdate.h
+  IfxDriverSource/IFXTPMUpdate/AdapterInformation.h
+  IfxDriverSource/IFXTPMUpdate/ComponentName.h
+  IfxDriverSource/IFXTPMUpdate/FirmwareManagement.h
+  IfxDriverSource/IFXTPMUpdate/IFXTPMUpdateApp.h
+  IfxDriverSource/IFXTPMUpdate/PropertyDefines.h
+  IfxDriverSource/IFXTPMUpdate/StdInclude.h
+
+  # Infineon Sources
+  IfxDriverSource\IFXTPMUpdate\Error.c
+  IfxDriverSource\IFXTPMUpdate\Logging.c
+  IfxDriverSource\IFXTPMUpdate\FirmwareManagement.c
+
+  IfxDriverSource\Common\FirmwareUpdate.c
+  IfxDriverSource\Common\FirmwareImage.c
+  IfxDriverSource\Common\Utility.c
+  IfxDriverSource\Common\DeviceManagement.c
+  IfxDriverSource\Common\PropertyStorage.c
+
+  IfxDriverSource\Common\TpmDeviceAccess\TPM_TIS.c
+
+  IfxDriverSource\Common\TpmDeviceAccess\UEFI\DeviceAccess.c
+  IfxDriverSource\Common\TpmDeviceAccess\UEFI\TpmIO.c
+
+  IfxDriverSource\Common\Platform\UEFI\Platform.c
+
+  IfxDriverSource\Common\Crypt\UEFI\Crypt.c
+
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_OIAP.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_OSAP.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_Startup.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_GetCapability.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_GetTestResult.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_FieldUpgradeStart.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_FieldUpgradeUpdate.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_FieldUpgradeComplete.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_FieldUpgradeInfoRequest.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_FieldUpgradeInfoRequest2.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_OwnerReadInternalPub.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_FlushSpecific.c
+  IfxDriverSource\Common\MicroTss\Tpm_1_2\TPM_Marshal.c
+
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_Marshal.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_FieldUpgradeMarshal.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_FieldUpgradeStartVendor.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_Startup.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_FlushContext.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_GetTestResult.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_PolicySecret.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_GetCapability.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_HierarchyChangeAuth.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_PolicyCommandCode.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_StartAuthSession.c
+  IfxDriverSource\Common\MicroTss\Tpm_2_0\TPM2_SetPrimaryPolicy.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  MsCapsuleUpdatePkg/MsCapsuleUpdatePkg.dec
+  TpmCapsuleUpdatePkg/TpmCapsuleUpdatePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+
+[LibraryClasses]
+  DebugLib
+  Tpm12DeviceLib
+  Tpm12CommandLib
+  Tpm2DeviceLib
+  Tpm2CommandLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PrintLib
+  BaseCryptLib
+  MsBlobPersistenceLib
+  UefiRuntimeServicesTableLib
+  PcdLib
+  ReportStatusCodeLib
+  FmpRecoveryProgressIndicatorLib
+
+
+[Pcd]
+  gMsCapsuleUpdatePkgTokenSpaceGuid.PcdDeviceLibWrapperDeviceGuid       ## Used to identify the persistence blob (Fallback).
+  gMsCapsuleUpdatePkgTokenSpaceGuid.PcdProgressColor                    ## Used to color the recovery progress indicator.
+  gTpmCapsuleUpdatePkgTokenSpaceGuid.TpmMaxAdvertisedUpdates             ## Used to configure how many remaining updates will be marked in ESRT.
+  gTpmCapsuleUpdatePkgTokenSpaceGuid.TpmMaxAllowedCapsuleUpdates         ## Used to configure how many updates will be allowed via capusle.
+  gTpmCapsuleUpdatePkgTokenSpaceGuid.PcdDeviceTpmFmpGuidCertified        ## Used to identify the persistence blob for Certified TPM versions.
+  gTpmCapsuleUpdatePkgTokenSpaceGuid.PcdDeviceTpmFmpGuidUncertified      ## Used to identify the persistence blob for Uncertified TPM versions.
+
+[Guids]
+  gZeroGuid
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /D UEFI /D CODE_ANALYSIS /D IFXTPMUpdate /analyze:pluginlocalespc.dll
+  MSFT:RELEASE_*_*_CC_FLAGS = /analyze
+  MSFT:NOOPT_*_*_CC_FLAGS = /analyze:WX-
+  MSFT:DEBUG_*_*_CC_FLAGS = /analyze:WX-
