@@ -607,7 +607,7 @@ class SystemFirmwareTable(object):
         return (-20, None, "GetSystemFirmwareTable is None")
 
     def GetFbpt(self):
-        param0 = c_int(196) # 196 is SystemFirmwareBootPerformanceInformation
+        param0 = c_int(198) # 198 is SystemFirmwareBootPerformanceInformation
         param1 = c_void_p(0)
         param2 = c_ulong(0)
         param3c = c_ulong(0)
