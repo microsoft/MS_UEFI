@@ -51,6 +51,7 @@
   gEfiPeiReset2PpiGuid                       ## PRODUCES
   gEdkiiPlatformSpecificResetFilterPpiGuid   ## PRODUCES
   gEdkiiPlatformSpecificResetHandlerPpiGuid  ## PRODUCES
+  gEdkiiPlatformSpecificResetNotificationPpiGuid  ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies
