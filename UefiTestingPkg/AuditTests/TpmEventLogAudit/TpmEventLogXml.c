@@ -31,7 +31,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define LIST_XML_TEMPLATE "<?xml version=\"1.0\" encoding=\"utf-8\"?><Events></Events>"
 #define DIGEST_XML_TEMPLATE "<Digests></Digests>"
 
-#define MAX_STRING_LENGTH (0x10000)
+#define MAX_STRING_LENGTH (0xFFFF)
 
 
 //Helper functions
@@ -76,6 +76,8 @@ ERROR:
   return Root;
 }
 
+
+#define NUM_OF_PAGES (16)
 /**
 Creates a new XmlNode for an event and adds it to the list
 
@@ -109,7 +111,7 @@ New_NodeInList(
   UINTN                     DigestSize;
   UINT8                     *DigestBuffer;
 
-  AsciiString = AllocatePages(EFI_SIZE_TO_PAGES(MAX_STRING_LENGTH));  //allocate 64kb
+  AsciiString = AllocatePages(NUM_OF_PAGES);  //allocate 64kb
   if (AsciiString == NULL)
   {
     DEBUG((DEBUG_ERROR, "%a - Failed to allocate 64kb for string conversion\n", __FUNCTION__));
@@ -291,7 +293,7 @@ ERROR_EXIT:
   if (NewEventNode != NULL)  { FreeXmlTree(&NewEventNode);  }
   if (TempNode != NULL)      { FreeXmlTree(&TempNode);  }
   if (DigestNode != NULL)    { FreeXmlTree(&DigestNode);  }
-  if (AsciiString != NULL)   { FreePages(AsciiString, EFI_SIZE_TO_PAGES(MAX_STRING_LENGTH)); }
+  if (AsciiString != NULL)   { FreePages(AsciiString, NUM_OF_PAGES); }
 
   return NULL;
 }
