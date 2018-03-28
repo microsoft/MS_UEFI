@@ -101,6 +101,38 @@ BOOLEAN                  mSmmCodeAccessCheckEnable = FALSE;
 //
 SPIN_LOCK                *mConfigSmmCodeAccessCheckLock = NULL;
 
+//
+// MSCHANGE [BEGIN] - Add flag to enable "test mode" for the SMM protections.
+//  
+// Flag to indicate exception handling should be in test mode.
+// This will cause exceptions to reset the system and/or log
+// additional telemetry.
+//
+
+/**
+  Enable exception handling test mode.
+
+  NOTE: This should only work on debug builds, otherwise return EFI_UNSUPPORTED.
+
+  @retval EFI_SUCCESS            Test mode enabled.
+  @retval EFI_UNSUPPORTED        Test mode could not be enabled.
+
+**/
+EFI_STATUS
+EnableSmmExceptionTestMode (
+  VOID
+  );
+
+//
+// Protocol for other drivers to enable test mode.
+//
+SMM_EXCEPTION_TEST_PROTOCOL mSmmExceptionTestProtocol = {
+  EnableSmmExceptionTestMode
+};
+EFI_HANDLE mSmmExceptionTestProtocolHandle = NULL;
+
+BOOLEAN mSmmRebootOnException = TRUE;  
+// MSCHANGE [END]
 /**
   Initialize IDT to setup exception handlers for SMM.
 
@@ -551,6 +583,7 @@ PiCpuSmmEntry (
     gSmmJmpAddr.Segment = LONG_MODE_CODE_SEGMENT;
   }
 
+  mSmmRebootOnException = PcdGetBool(PcdSmmExceptionRebootInsteadOfHaltDefault); 
   //
   // Find out SMRR Base and SMRR Size
   //
@@ -881,6 +914,18 @@ PiCpuSmmEntry (
                     );
   ASSERT_EFI_ERROR (Status);
 
+  // MSCHANGE [BEGIN] - Add flag to enable "test mode" for the SMM protections.
+  //                    
+  if (FeaturePcdGet (PcdSmmExceptionTestModeSupport)) {
+    Status = gSmst->SmmInstallProtocolInterface (
+                      &mSmmExceptionTestProtocolHandle,
+                      &gSmmExceptionTestProtocolGuid,
+                      EFI_NATIVE_INTERFACE,
+                      &mSmmExceptionTestProtocol
+                      );
+    ASSERT_EFI_ERROR (Status);
+  }
+  // MSCHANGE [END]
   //
   // Expose address of CPU Hot Plug Data structure if CPU hot plug is supported.
   //
@@ -1210,3 +1255,32 @@ PerformPreTasks (
 {
   RestoreSmmConfigurationInS3 ();
 }
+
+// MSCHANGE [BEGIN] - Add flag to enable "test mode" for the SMM protections.
+//                    
+/**
+  Enable exception handling test mode.
+
+  NOTE: This should only work on debug builds, otherwise return EFI_UNSUPPORTED.
+
+  @retval EFI_SUCCESS            Test mode enabled.
+  @retval EFI_UNSUPPORTED        Test mode could not be enabled.
+
+**/
+EFI_STATUS
+EnableSmmExceptionTestMode (
+  VOID
+  )
+{
+  EFI_STATUS  Status = EFI_UNSUPPORTED;
+
+  if (FeaturePcdGet (PcdSmmExceptionTestModeSupport)) 
+  {
+    DEBUG ((EFI_D_INFO, __FUNCTION__" - Test mode enabled!\n"));
+    mSmmRebootOnException = TRUE;
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+// MSCHANGE [END]

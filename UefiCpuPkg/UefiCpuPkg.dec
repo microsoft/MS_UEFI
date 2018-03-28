@@ -68,6 +68,11 @@
   ## Include/Protocol/SmmCpuService.h
   gEfiSmmCpuServiceProtocolGuid  = { 0x1d202cab, 0xc8ab, 0x4d5c, { 0x94, 0xf7, 0x3c, 0xfc, 0xc0, 0xd3, 0xd3, 0x35 }}
 
+
+  #MSCHANGE - Add support for testing Smm protections
+  #
+  ## Include/Protocol/SmmExceptionTestProtocol.h
+  gSmmExceptionTestProtocolGuid   = { 0xb76383a1, 0x0e70, 0x4a3f, { 0x86, 0xb4, 0xc6, 0x13, 0x4c, 0x8e, 0x57, 0x23 }}
 #
 # [Error.gUefiCpuPkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
@@ -129,6 +134,11 @@
   # @Prompt Lock SMM Feature Control MSR.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
 
+
+  ## If TRUE, Install the protocol to communicate to the Smm Exception 
+  # handler so automated testing can be performed. 
+  # 
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport|FALSE|BOOLEAN|0x00000021
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC
@@ -179,6 +189,9 @@
   # @Prompt Number of reserved variable MTRRs.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0x2|UINT32|0x00000015
 
+  ## If TRUE, the default Cpu Exception Handler in SMM will reboot 
+  # This handler state can be changed by using the Exception Test Protocol
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionRebootInsteadOfHaltDefault|TRUE|BOOLEAN|0x00000020
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies max supported number of Logical Processors.
   # @Prompt Configure max supported number of Logical Processors

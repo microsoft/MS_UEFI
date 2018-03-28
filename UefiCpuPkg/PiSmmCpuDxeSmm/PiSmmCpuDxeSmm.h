@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCpuService.h>
+#include <Protocol/SmmExceptionTestProtocol.h>
 
 #include <Guid/AcpiS3Context.h>
 
@@ -156,6 +157,7 @@ extern EFI_SMM_CPU_PROTOCOL   mSmmCpu;
 ///
 extern UINT8  mSmmSaveStateRegisterLma;
 
+extern BOOLEAN   mSmmRebootOnException;
 
 //
 // SMM CPU Protocol function prototypes.

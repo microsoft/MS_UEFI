@@ -119,12 +119,14 @@
   ReportStatusCodeLib
   SmmCpuFeaturesLib
   PeCoffGetEntryPointLib
+  UefiResetSystemLib    ## MSCHANGE - Allow system to reset instead of halt in test mode.
 
 [Protocols]
   gEfiSmmAccess2ProtocolGuid               ## CONSUMES
   gEfiMpServiceProtocolGuid                ## CONSUMES
   gEfiSmmConfigurationProtocolGuid         ## PRODUCES
   gEfiSmmCpuProtocolGuid                   ## PRODUCES
+  gSmmExceptionTestProtocolGuid            ## PRODUCES
   gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
   gEfiSmmCpuServiceProtocolGuid            ## PRODUCES
 
@@ -143,6 +145,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable                 ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileRingBuffer             ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionTestModeSupport         ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES
@@ -154,6 +157,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmExceptionRebootInsteadOfHaltDefault   ## CONSUMES
 
 [Depex]
   gEfiMpServiceProtocolGuid

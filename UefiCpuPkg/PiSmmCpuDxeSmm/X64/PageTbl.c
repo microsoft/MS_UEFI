@@ -12,6 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#include <Library/UefiResetSystemLib.h> // MSCHANGE - Allow system to reset instead of halt in test mode.
+
 #include "PiSmmCpuDxeSmm.h"
 
 #define PAGE_TABLE_PAGES            8
@@ -661,7 +663,9 @@ SmiPFHandler (
       (PFAddress >= mCpuHotPlugData.SmrrBase) &&
       (PFAddress < (mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize))) {
     DEBUG ((EFI_D_ERROR, "SMM stack overflow!\n"));
-    CpuDeadLoop ();
+    //mschange CpuDeadLoop ();
+    // MSCHANGE - Allow system to reset instead of halt in test mode.
+    goto HaltOrReboot;
   }
 
   //
@@ -674,7 +678,9 @@ SmiPFHandler (
       DEBUG_CODE (
         DumpModuleInfoByIp (*(UINTN *)(UINTN)SystemContext.SystemContextX64->Rsp);
       );
-      CpuDeadLoop ();
+      //mschange CpuDeadLoop ();
+      // MSCHANGE - Allow system to reset instead of halt in test mode.
+      goto HaltOrReboot;
     }
   }
 
@@ -688,4 +694,22 @@ SmiPFHandler (
   }
 
   ReleaseSpinLock (mPFLock);
+
+
+  // MSCHANGE [BEGIN] - Allow system to reset instead of halt in test mode.
+  goto Exit;
+
+HaltOrReboot:
+  if (mSmmRebootOnException) {
+    DEBUG ((DEBUG_ERROR, __FUNCTION__" - Reboot here in test mode.\n"));
+    LibResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+    CpuDeadLoop ();
+  }
+  else {
+    CpuDeadLoop ();
+  }
+
+Exit:
+  return;
+  // MSCHANGE [END]
 }
